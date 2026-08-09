@@ -7,6 +7,8 @@ from dataclasses import dataclass
 from fontTools.pens.reverseContourPen import ReverseContourPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 
+from .curvature import CurveBox, ResolvedCurve, aperture_angle, sample_superellipse
+
 Point = tuple[float, float]
 
 
@@ -79,7 +81,7 @@ def soft_ring(
     stroke: float,
     radius: float,
 ) -> None:
-    """Stiff rounded rectangular ring: round enough to breathe, never pill-like."""
+    """Legacy stiff rounded ring retained while glyph families migrate."""
     rounded_rect(pen, x0, y0, x1, y1, radius, clockwise=True)
     rounded_rect(
         pen,
@@ -90,6 +92,36 @@ def soft_ring(
         max(0, radius - stroke * 0.45),
         clockwise=False,
     )
+
+
+def profiled_ring(
+    pen: TTGlyphPen,
+    x0: float,
+    y0: float,
+    x1: float,
+    y1: float,
+    *,
+    stroke: float,
+    profile: ResolvedCurve,
+    steps: int = 36,
+) -> None:
+    """Ring generated from one dimensionless superellipse profile."""
+    outer_box = CurveBox(x0, y0, x1, y1)
+    inner_box = outer_box.inset(stroke)
+    outer = sample_superellipse(
+        outer_box,
+        exponent=profile.exponent,
+        axis_bias=profile.axis_bias,
+        steps=steps,
+    )[:-1]
+    inner = sample_superellipse(
+        inner_box,
+        exponent=profile.inner_exponent,
+        axis_bias=profile.axis_bias,
+        steps=steps,
+    )[:-1]
+    polygon(pen, outer, clockwise=True)
+    polygon(pen, inner, clockwise=False)
 
 
 def _open_bowl_ccw(
@@ -103,7 +135,7 @@ def _open_bowl_ccw(
     radius: float,
     aperture: float,
 ) -> None:
-    """Single C-shaped contour, opening to the right, drawn CCW."""
+    """Legacy rounded-rectangle C contour retained during migration."""
     r = min(radius, (x1 - x0) / 2, (y1 - y0) / 2)
     ir = max(0, r - stroke * 0.45)
     mid = (y0 + y1) / 2
@@ -171,6 +203,54 @@ def open_soft_bowl(
     axis = x0 + x1
     mirrored = TransformPen(ReverseContourPen(pen), (-1, 0, 0, 1, axis, 0))
     rec.replay(mirrored)
+
+
+def profiled_open_bowl(
+    pen: TTGlyphPen,
+    x0: float,
+    y0: float,
+    x1: float,
+    y1: float,
+    *,
+    stroke: float,
+    profile: ResolvedCurve,
+    opening: str = "right",
+    steps: int = 34,
+) -> None:
+    """Open superellipse contour with weight-aware aperture and terminals."""
+    if opening not in {"right", "left"}:
+        raise ValueError("opening must be 'right' or 'left'")
+
+    outer_box = CurveBox(x0, y0, x1, y1)
+    inner_box = outer_box.inset(stroke)
+    gap = aperture_angle(profile)
+    bias = max(-0.35, min(0.35, profile.terminal_bias))
+    upper_gap = gap * (1.0 - bias)
+    lower_gap = gap * (1.0 + bias)
+
+    outer = sample_superellipse(
+        outer_box,
+        exponent=profile.exponent,
+        axis_bias=profile.axis_bias,
+        start=upper_gap,
+        end=math.tau - lower_gap,
+        steps=steps,
+    )
+    inner = sample_superellipse(
+        inner_box,
+        exponent=profile.inner_exponent,
+        axis_bias=profile.axis_bias,
+        start=math.tau - lower_gap,
+        end=upper_gap,
+        steps=steps,
+    )
+    points = outer + inner
+
+    if opening == "left":
+        axis = x0 + x1
+        points = [(axis - x, y) for x, y in points]
+
+    polygon(pen, points, clockwise=True)
 
 
 def thick_segment(
