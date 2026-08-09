@@ -1,4 +1,4 @@
-# Saygıyla Sunar Mono — Design System v0.2
+# Saygıyla Sunar Mono — Design System v0.3
 
 ## Intent
 
@@ -10,22 +10,50 @@ display.
 
 The visual equation is:
 
-**triadic construction × hexagonal axes × controlled roundness × engineered stiffness × documentary legibility**
+**parametric family DNA × triadic/hexagonal construction × controlled roundness × engineered stiffness × documentary legibility**
+
+## Identity hierarchy
+
+The font is not defined by one visible gimmick, one radius or one grid. The
+order of authority is:
+
+1. recognition and documentary legibility;
+2. shared parametric family DNA;
+3. stiffness/roundness character;
+4. family-specific curvature derivatives;
+5. 30°/60° and 3/6/9 construction influence;
+6. final optical correction.
+
+See `CURVATURE_MODEL.md` for the equations and scaling model.
 
 ## 3 → 6 → 9 lattice
 
-The construction cell is **648 units** wide.
+The current construction cell is **648 units** wide.
 
 - 1/3 = **216**
 - 1/6 = **108**
 - 1/9 = **72**
 
-These values are design coordinates, not decorative numerology. Major stems,
-bowls, apertures, diagonals, terminals and spacing decisions should prefer this
-lattice or simple half-steps derived from it.
+These are preferred landmarks, not mandatory coordinates. Geometry can use
+exact lattice points, half-steps or soft attraction toward the lattice. If an
+exact 3/6/9 placement damages recognition, optical placement wins.
 
-The OpenType container remains 1000 UPM for interoperability. The design logic
-inside the container does not need to inherit the decimal structure of the UPM.
+The OpenType container remains 1000 UPM for interoperability. The internal
+design logic does not inherit the decimal structure of the UPM.
+
+## Parametric curvature
+
+Rounded families are generated from a superellipse-based model. The controlling
+stiffness exponent and related parameters are dimensionless, so the same family
+character can be re-resolved under changes in scale, stroke and local glyph box.
+
+Absolute values such as `radius=90` are implementation outputs, not identity.
+The important values are ratios and functions: curvature exponent, stroke ratio,
+aperture ratio, terminal bias and axis bias.
+
+Different glyph groups use small derivatives of one `CORE_DNA` rather than
+unrelated curve presets. O, e, S and 9 are allowed to distribute curvature
+differently while remaining visibly related.
 
 ## Dimensional model
 
@@ -43,8 +71,9 @@ Roundness exists to release optical pressure at corners and joints, not to make
 the face friendly or soft.
 
 - strokes remain mechanically straight;
-- large bowls use stiff rounded corners;
-- lowercase bowls receive slightly more radius than hard rectangular symbols;
+- large bowls are stiff but not polygonal;
+- lowercase and flow families may redistribute curvature;
+- heavier weights receive optical counter/aperture compensation;
 - terminal cuts and diagonals retain documentary precision.
 
 Reference feeling: the stiffness/technology balance associated with Bender and
@@ -52,11 +81,23 @@ Exo, without copying their glyph outlines.
 
 ## Family grammar
 
-### Round family
-`O 0 o a g C G c e 6 8 9`
+### Bowl family
+`O 0 o a g 6 8 9`
 
-All use the same soft-ring/open-bowl vocabulary. `0` receives an explicit slash
-because documentary disambiguation outranks stylistic purity.
+Closed forms derive from the same core curvature DNA. `0` receives an explicit
+slash because documentary disambiguation outranks stylistic purity.
+
+### Open family
+`C G c e`
+
+Open forms derive from the core with controlled aperture and terminal changes.
+The aperture is a ratio/function, not a fixed unit value.
+
+### Flow family
+`S s Ş ş 3`
+
+Flow forms may use a softer curvature derivative and asymmetric terminal bias,
+but must remain recognisably part of the same typeface.
 
 ### Ambiguity family
 `1 I l ı i 0 O S 5 Z 2`
@@ -91,7 +132,8 @@ Avoid:
 - seven-segment imitation
 - stencil clichés
 - rounded SaaS friendliness
-- ornamental 'sacred geometry'
+- ornamental sacred-geometry tricks
+- sacrificing recognition to mathematical purity
 
 ## Review string
 
