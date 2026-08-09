@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "saygiylasunarfont"
-version = "0.1.0"
-description = "Programmatic geometric monospaced font project"
+version = "0.2.0"
+description = "Programmatic 3-6-9 geometric monospaced font project"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = ["fonttools>=4.53"]
