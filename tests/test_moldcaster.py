@@ -4,13 +4,11 @@ import math
 
 from saygiylasunarfont.config import CORE_UNIT, L, M
 from saygiylasunarfont.constraints import (
-    CURVE_HANDLE if False else PointRole,  # type: ignore[comparison-overlap]
-)
-from saygiylasunarfont.constraints import (
     DOCUMENT_AXES,
     DYADIC_AXES,
     ROLE_PROFILES,
     TRIHEX_AXES,
+    PointRole,
     attract_angle,
     nearest_angle,
 )
