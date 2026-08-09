@@ -5,7 +5,7 @@ from collections.abc import Callable
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 
 from .config import M
-from .geometry import chevron, dot, octagonal_ring, polygon, rect, thick_segment
+from .geometry import dot, octagonal_ring, polygon, rect, thick_segment
 
 Draw = Callable[[TTGlyphPen], None]
 
@@ -18,8 +18,8 @@ def _glyph(draw: Draw | None = None):
 
 
 def _notdef(pen: TTGlyphPen) -> None:
-    rect(pen, 60, 0, 540, 700)
-    rect(pen, 140, 80, 460, 620)
+    polygon(pen, [(60, 0), (540, 0), (540, 700), (60, 700)], clockwise=True)
+    polygon(pen, [(140, 80), (460, 80), (460, 620), (140, 620)], clockwise=False)
 
 
 def _H(pen: TTGlyphPen) -> None:
@@ -93,7 +93,6 @@ def _o(pen: TTGlyphPen) -> None:
 def _a(pen: TTGlyphPen) -> None:
     # Single-storey a: same bowl DNA as o, with a firm engineering stem.
     _o(pen)
-    s = M.stroke
     rect(pen, 425, 0, 505, M.x_height)
     rect(pen, 425, -10, 540, 70)
 
@@ -101,7 +100,6 @@ def _a(pen: TTGlyphPen) -> None:
 def _g(pen: TTGlyphPen) -> None:
     # Single-storey g keeps the lowercase system compact and recognisable.
     _o(pen)
-    s = M.stroke
     rect(pen, 425, -145, 505, M.x_height)
     rect(pen, 270, -200, 505, -120)
     thick_segment(pen, 270, -200, 190, -145, 65)
@@ -154,15 +152,24 @@ def _Z(pen: TTGlyphPen) -> None:
     rect(pen, M.left, 0, M.right, s)
 
 
-def _S(pen: TTGlyphPen) -> None:
+def _segmented_s(pen: TTGlyphPen, top: int) -> None:
     s = M.stroke
-    rect(pen, 135, M.cap_height - s, 470, M.cap_height)
-    rect(pen, 130, 310, 470, 390)
+    mid = top // 2
+    rect(pen, 135, top - s, 470, top)
+    rect(pen, 130, mid - s / 2, 470, mid + s / 2)
     rect(pen, 130, 0, 465, s)
-    rect(pen, 95, 355, 175, 620)
-    rect(pen, 425, 80, 505, 345)
-    thick_segment(pen, 135, 620, 185, 670, 62)
+    rect(pen, 95, mid + 5, 175, top - 80)
+    rect(pen, 425, 80, 505, mid - 5)
+    thick_segment(pen, 135, top - 80, 185, top - 30, 62)
     thick_segment(pen, 415, 30, 465, 80, 62)
+
+
+def _S(pen: TTGlyphPen) -> None:
+    _segmented_s(pen, M.cap_height)
+
+
+def _s(pen: TTGlyphPen) -> None:
+    _segmented_s(pen, M.x_height)
 
 
 def _V(pen: TTGlyphPen) -> None:
@@ -188,11 +195,74 @@ def _U(pen: TTGlyphPen) -> None:
 
 
 def _u(pen: TTGlyphPen) -> None:
-    s = M.stroke
     rect(pen, 95, 90, 175, M.x_height)
     rect(pen, 425, 0, 505, M.x_height)
     rect(pen, 175, 0, 425, 80)
     thick_segment(pen, 135, 105, 190, 45, 65)
+
+
+# --- Numerals -------------------------------------------------------------
+# v0 numerals share a segmented technical skeleton. The family can be softened
+# later without changing widths or codepoint coverage.
+
+
+def _digit_two(pen: TTGlyphPen) -> None:
+    s = M.stroke
+    rect(pen, 120, 620, 470, 700)
+    rect(pen, 425, 350, 505, 625)
+    rect(pen, 130, 310, 470, 390)
+    rect(pen, 95, 75, 175, 340)
+    rect(pen, 130, 0, 480, 80)
+
+
+def _digit_three(pen: TTGlyphPen) -> None:
+    s = M.stroke
+    rect(pen, 120, 620, 465, 700)
+    rect(pen, 135, 310, 465, 390)
+    rect(pen, 120, 0, 465, 80)
+    rect(pen, 425, 350, 505, 625)
+    rect(pen, 425, 75, 505, 350)
+
+
+def _digit_four(pen: TTGlyphPen) -> None:
+    rect(pen, 95, 335, 175, 700)
+    rect(pen, 130, 300, 505, 380)
+    rect(pen, 425, 0, 505, 700)
+
+
+def _digit_five(pen: TTGlyphPen) -> None:
+    rect(pen, 120, 620, 480, 700)
+    rect(pen, 95, 350, 175, 625)
+    rect(pen, 130, 310, 470, 390)
+    rect(pen, 425, 75, 505, 340)
+    rect(pen, 120, 0, 465, 80)
+
+
+def _digit_six(pen: TTGlyphPen) -> None:
+    rect(pen, 120, 620, 465, 700)
+    rect(pen, 95, 75, 175, 625)
+    rect(pen, 130, 310, 470, 390)
+    rect(pen, 425, 75, 505, 340)
+    rect(pen, 130, 0, 470, 80)
+
+
+def _digit_seven(pen: TTGlyphPen) -> None:
+    rect(pen, 105, 620, 495, 700)
+    thick_segment(pen, 455, 635, 225, 0, M.stroke)
+
+
+def _digit_eight(pen: TTGlyphPen) -> None:
+    octagonal_ring(pen, 120, 340, 480, 710, stroke=72, corner=78)
+    octagonal_ring(pen, 120, -10, 480, 360, stroke=72, corner=78)
+
+
+def _digit_nine(pen: TTGlyphPen) -> None:
+    octagonal_ring(pen, 105, 310, 505, 710, stroke=M.stroke, corner=88)
+    rect(pen, 425, 60, 505, 350)
+    rect(pen, 130, 0, 465, 80)
+
+
+# --- Accents --------------------------------------------------------------
 
 
 def _diaeresis(pen: TTGlyphPen, y: int) -> None:
@@ -237,6 +307,9 @@ def _lower_breve(base: Draw) -> Draw:
     return _with(base, lambda pen: _breve(pen, M.x_height + 80))
 
 
+# --- Punctuation / symbols ----------------------------------------------
+
+
 def _period(pen: TTGlyphPen) -> None:
     dot(pen, M.center, 40, 80)
 
@@ -249,6 +322,12 @@ def _comma(pen: TTGlyphPen) -> None:
 def _colon(pen: TTGlyphPen) -> None:
     dot(pen, M.center, 120, 72)
     dot(pen, M.center, 380, 72)
+
+
+def _semicolon(pen: TTGlyphPen) -> None:
+    dot(pen, M.center, 380, 72)
+    dot(pen, M.center, 120, 72)
+    thick_segment(pen, M.center + 15, 95, M.center - 30, -10, 42)
 
 
 def _hyphen(pen: TTGlyphPen) -> None:
@@ -301,6 +380,24 @@ def _bracket_right(pen: TTGlyphPen) -> None:
     rect(pen, 190, 0, 400, 80)
 
 
+def _brace_left(pen: TTGlyphPen) -> None:
+    thick_segment(pen, 380, 700, 285, 610, 60)
+    rect(pen, 245, 390, 315, 610)
+    thick_segment(pen, 280, 390, 205, 350, 60)
+    thick_segment(pen, 205, 350, 280, 310, 60)
+    rect(pen, 245, 90, 315, 310)
+    thick_segment(pen, 285, 90, 380, 0, 60)
+
+
+def _brace_right(pen: TTGlyphPen) -> None:
+    thick_segment(pen, 220, 700, 315, 610, 60)
+    rect(pen, 285, 390, 355, 610)
+    thick_segment(pen, 320, 390, 395, 350, 60)
+    thick_segment(pen, 395, 350, 320, 310, 60)
+    rect(pen, 285, 90, 355, 310)
+    thick_segment(pen, 315, 90, 220, 0, 60)
+
+
 def _less(pen: TTGlyphPen) -> None:
     thick_segment(pen, 420, 500, 180, 310, 65)
     thick_segment(pen, 180, 310, 420, 120, 65)
@@ -312,39 +409,29 @@ def _greater(pen: TTGlyphPen) -> None:
 
 
 def _lira(pen: TTGlyphPen) -> None:
-    s = 72
     rect(pen, 245, 0, 325, 700)
     thick_segment(pen, 170, 470, 415, 570, 52)
     thick_segment(pen, 170, 350, 415, 450, 52)
-    thick_segment(pen, 285, 35, 470, 190, s)
+    thick_segment(pen, 285, 35, 470, 190, 72)
 
 
 def _sup_two(pen: TTGlyphPen) -> None:
-    s = 52
     rect(pen, 245, 625, 410, 680)
     rect(pen, 190, 470, 410, 525)
-    thick_segment(pen, 390, 620, 215, 510, s)
+    thick_segment(pen, 390, 620, 215, 510, 52)
 
 
 def glyph_name(ch: str) -> str:
     digit_names = {
-        "0": "zero",
-        "1": "one",
-        "2": "two",
-        "3": "three",
-        "4": "four",
-        "5": "five",
-        "6": "six",
-        "7": "seven",
-        "8": "eight",
-        "9": "nine",
+        "0": "zero", "1": "one", "2": "two", "3": "three", "4": "four",
+        "5": "five", "6": "six", "7": "seven", "8": "eight", "9": "nine",
     }
     punctuation = {
-        " ": "space", ".": "period", ",": "comma", ":": "colon",
+        " ": "space", ".": "period", ",": "comma", ":": "colon", ";": "semicolon",
         "-": "hyphen", "_": "underscore", "/": "slash", "\\": "backslash",
         "+": "plus", "=": "equal", "(": "parenleft", ")": "parenright",
-        "[": "bracketleft", "]": "bracketright", "<": "less", ">": "greater",
-        "₺": "uni20BA", "²": "twosuperior",
+        "[": "bracketleft", "]": "bracketright", "{": "braceleft", "}": "braceright",
+        "<": "less", ">": "greater", "₺": "uni20BA", "²": "twosuperior",
     }
     if ch in digit_names:
         return digit_names[ch]
@@ -361,11 +448,14 @@ DRAWERS: dict[str, Draw | None] = {
     "H": _H, "I": _I, "O": _O, "C": _C, "G": _G, "S": _S,
     "T": _T, "U": _U, "V": _V, "W": _W, "Z": _Z,
     "a": _a, "c": _c, "e": _e, "g": _g, "i": _i, "ı": _dotless_i,
-    "l": _l, "o": _o, "u": _u,
-    "0": _zero, "1": _one,
-    ".": _period, ",": _comma, ":": _colon, "-": _hyphen, "_": _underscore,
-    "/": _slash, "\\": _backslash, "+": _plus, "=": _equal,
-    "(": _paren_left, ")": _paren_right, "[": _bracket_left, "]": _bracket_right,
+    "l": _l, "o": _o, "s": _s, "u": _u,
+    "0": _zero, "1": _one, "2": _digit_two, "3": _digit_three, "4": _digit_four,
+    "5": _digit_five, "6": _digit_six, "7": _digit_seven, "8": _digit_eight,
+    "9": _digit_nine,
+    ".": _period, ",": _comma, ":": _colon, ";": _semicolon,
+    "-": _hyphen, "_": _underscore, "/": _slash, "\\": _backslash,
+    "+": _plus, "=": _equal, "(": _paren_left, ")": _paren_right,
+    "[": _bracket_left, "]": _bracket_right, "{": _brace_left, "}": _brace_right,
     "<": _less, ">": _greater, "₺": _lira, "²": _sup_two,
 
     "Ç": _with(_C, _cedilla),
@@ -377,7 +467,7 @@ DRAWERS: dict[str, Draw | None] = {
     "ç": _with(_c, _cedilla),
     "ğ": _lower_breve(_g),
     "ö": _lower_diaeresis(_o),
-    "ş": _with(_S, _cedilla),
+    "ş": _with(_s, _cedilla),
     "ü": _lower_diaeresis(_u),
 }
 
