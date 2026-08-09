@@ -97,7 +97,7 @@ Avoid:
 
 The identity is considered unstable until this string works as one system:
 
-`O0 1Ilı aoe cg CGSŞş TVWZ 0123456789 ÇĞİÖŞÜ çğıöşü ₺ ² []{}()< >`
+`O0 1Ilı aoe cg CGSŞş TVWZ 0123456789 ÇĞİÖŞÜ çğıöşü ₺ ² []{}()<>`
 
 Do not expand the alphabet merely to increase glyph count before this string is
 optically coherent.
