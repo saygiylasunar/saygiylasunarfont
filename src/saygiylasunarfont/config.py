@@ -7,9 +7,11 @@ from dataclasses import dataclass
 class Metrics:
     """Global font metrics.
 
-    The OpenType container stays conventional (1000 UPM), while the glyph cell
-    is deliberately 648 units wide so it divides exactly into 3, 6 and 9.
+    The OpenType container stays conventional (1000 UPM), while the current
+    monospaced cell is 648 units wide. The 3/6/9 lattice is a useful construction
+    guide, not a law that is allowed to damage glyph recognition.
     """
+
     upm: int = 1000
     advance: int = 648
     ascender: int = 800
@@ -37,21 +39,30 @@ class Metrics:
 
 @dataclass(frozen=True)
 class Lattice:
-    """3/6/9 construction grid for the monospaced cell."""
+    """3/6/9 construction grid with optional optical attraction.
+
+    Geometry may land exactly on the lattice when that improves rhythm, or use
+    `soft_snap` to retain the mathematical accent without sacrificing legibility.
+    """
 
     cell: int = 648
 
     @property
     def third(self) -> int:
-        return self.cell // 3  # 216
+        return self.cell // 3
 
     @property
     def sixth(self) -> int:
-        return self.cell // 6  # 108
+        return self.cell // 6
 
     @property
     def ninth(self) -> int:
-        return self.cell // 9  # 72
+        return self.cell // 9
+
+    def step(self, division: int) -> float:
+        if division <= 0:
+            raise ValueError("division must be positive")
+        return self.cell / division
 
     def x3(self, i: float) -> float:
         return i * self.third
@@ -62,6 +73,14 @@ class Lattice:
     def x9(self, i: float) -> float:
         return i * self.ninth
 
+    def soft_snap(self, value: float, *, division: int = 9, strength: float = 0.35) -> float:
+        """Attract a coordinate toward the lattice without forcing it there."""
+        if not 0.0 <= strength <= 1.0:
+            raise ValueError("strength must be between 0 and 1")
+        step = self.step(division)
+        target = round(value / step) * step
+        return value + (target - value) * strength
+
 
 M = Metrics()
 L = Lattice(M.advance)
@@ -69,4 +88,4 @@ L = Lattice(M.advance)
 FAMILY_NAME = "Saygıyla Sunar Mono"
 STYLE_NAME = "Regular"
 POSTSCRIPT_NAME = "SaygiylaSunarMono-Regular"
-VERSION = "0.2.0"
+VERSION = "0.3.0"
