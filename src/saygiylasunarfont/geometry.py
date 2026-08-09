@@ -70,6 +70,59 @@ def octagonal_ring(
     )
 
 
+def open_octagonal_bowl(
+    pen: TTGlyphPen,
+    x0: float,
+    y0: float,
+    x1: float,
+    y1: float,
+    *,
+    stroke: float,
+    corner: float,
+    opening: str = "right",
+) -> None:
+    """Draw a C-shaped octagonal stroke as one closed contour.
+
+    `opening` controls which side carries the aperture. The contour follows the
+    same outer/inner corner logic as `octagonal_ring`, so C/c/e/S families can
+    share the round-system DNA instead of falling back to rectangular segments.
+    """
+    if opening not in {"right", "left"}:
+        raise ValueError("opening must be 'right' or 'left'")
+
+    c = min(corner, (x1 - x0) / 2, (y1 - y0) / 2)
+    ix0, iy0 = x0 + stroke, y0 + stroke
+    ix1, iy1 = x1 - stroke, y1 - stroke
+    ic = min(max(0, corner - stroke / 2), (ix1 - ix0) / 2, (iy1 - iy0) / 2)
+
+    points: list[Point] = [
+        # Outer path: upper terminal -> around left side -> lower terminal.
+        (x1, y1 - c),
+        (x1 - c, y1),
+        (x0 + c, y1),
+        (x0, y1 - c),
+        (x0, y0 + c),
+        (x0 + c, y0),
+        (x1 - c, y0),
+        (x1, y0 + c),
+        # Inner return path: lower terminal -> around counter -> upper terminal.
+        (ix1, iy0 + ic),
+        (ix1 - ic, iy0),
+        (ix0 + ic, iy0),
+        (ix0, iy0 + ic),
+        (ix0, iy1 - ic),
+        (ix0 + ic, iy1),
+        (ix1 - ic, iy1),
+        (ix1, iy1 - ic),
+    ]
+
+    if opening == "left":
+        axis = x0 + x1
+        points = [(axis - x, y) for x, y in points]
+
+    polygon(pen, points, clockwise=True)
+
+
 def thick_segment(
     pen: TTGlyphPen,
     x0: float,
