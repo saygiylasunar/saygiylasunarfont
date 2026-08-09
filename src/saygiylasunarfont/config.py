@@ -3,26 +3,33 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 
+# Native construction quantum. The current mono cell is 18 cores wide.
+# Half-core values are allowed for optical/spacing roles; the core is a moldable
+# geometric reference, not a hard pixel grid.
+CORE_UNIT = 36
+
+
 @dataclass(frozen=True)
 class Metrics:
-    """Global font metrics.
+    """Global font metrics derived from the 36-unit construction core.
 
-    The OpenType container stays conventional (1000 UPM), while the current
-    monospaced cell is 648 units wide. The 3/6/9 lattice is a useful construction
-    guide, not a law that is allowed to damage glyph recognition.
+    OpenType remains conventional at 1000 UPM. Design dimensions are expressed
+    as rational multiples of CORE_UNIT so the geometry can be recast by the
+    Moldcaster into decimal, dyadic and future production media.
     """
 
     upm: int = 1000
-    advance: int = 648
+    core: int = CORE_UNIT
+    advance: int = 18 * CORE_UNIT
     ascender: int = 800
     descender: int = -200
-    cap_height: int = 720
-    x_height: int = 540
-    stroke: int = 72
-    overshoot: int = 12
-    sidebearing: int = 54
-    round_radius: int = 90
-    accent_gap: int = 54
+    cap_height: int = 20 * CORE_UNIT
+    x_height: int = 15 * CORE_UNIT
+    stroke: int = 2 * CORE_UNIT
+    overshoot: int = CORE_UNIT // 3
+    sidebearing: int = 3 * CORE_UNIT // 2
+    round_radius: int = 5 * CORE_UNIT // 2
+    accent_gap: int = 3 * CORE_UNIT // 2
 
     @property
     def left(self) -> int:
@@ -39,13 +46,17 @@ class Metrics:
 
 @dataclass(frozen=True)
 class Lattice:
-    """3/6/9 construction grid with optional optical attraction.
+    """Trihex construction guide retained for backwards-compatible glyph code.
 
-    Geometry may land exactly on the lattice when that improves rhythm, or use
-    `soft_snap` to retain the mathematical accent without sacrificing legibility.
+    New geometry should prefer Moldcaster + role constraints. `soft_snap` remains
+    a small convenience for existing diagnostic glyphs during migration.
     """
 
-    cell: int = 648
+    cell: int = 18 * CORE_UNIT
+
+    @property
+    def core(self) -> int:
+        return self.cell // 18
 
     @property
     def third(self) -> int:
@@ -74,7 +85,6 @@ class Lattice:
         return i * self.ninth
 
     def soft_snap(self, value: float, *, division: int = 9, strength: float = 0.35) -> float:
-        """Attract a coordinate toward the lattice without forcing it there."""
         if not 0.0 <= strength <= 1.0:
             raise ValueError("strength must be between 0 and 1")
         step = self.step(division)
@@ -88,4 +98,4 @@ L = Lattice(M.advance)
 FAMILY_NAME = "Saygıyla Sunar Mono"
 STYLE_NAME = "Regular"
 POSTSCRIPT_NAME = "SaygiylaSunarMono-Regular"
-VERSION = "0.3.0"
+VERSION = "0.4.0"
