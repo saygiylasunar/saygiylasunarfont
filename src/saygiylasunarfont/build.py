@@ -19,7 +19,11 @@ def build(output: Path | str = "build/SaygiylaSunarMono-Regular.ttf") -> Path:
     fb.setupGlyf(glyphs)
 
     # Monospace is an invariant. Ink may move inside the cell; advance never does.
-    metrics = {name: (M.advance, 0) for name in order}
+    glyph_table = fb.font["glyf"]
+    metrics = {
+        name: (M.advance, getattr(glyph_table[name], "xMin", 0))
+        for name in order
+    }
     fb.setupHorizontalMetrics(metrics)
     fb.setupHorizontalHeader(ascent=M.ascender, descent=M.descender)
 
