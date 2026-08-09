@@ -5,7 +5,7 @@ from collections.abc import Callable
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 
 from .config import M
-from .geometry import dot, octagonal_ring, polygon, rect, thick_segment
+from .geometry import dot, octagonal_ring, open_octagonal_bowl, polygon, rect, thick_segment
 
 Draw = Callable[[TTGlyphPen], None]
 
@@ -74,7 +74,6 @@ def _O(pen: TTGlyphPen) -> None:
 
 def _zero(pen: TTGlyphPen) -> None:
     _O(pen)
-    # A restrained slash keeps 0/O unmistakable in terminal use.
     thick_segment(pen, 190, 105, 410, 595, 56)
 
 
@@ -91,52 +90,54 @@ def _o(pen: TTGlyphPen) -> None:
 
 
 def _a(pen: TTGlyphPen) -> None:
-    # Single-storey a: same bowl DNA as o, with a firm engineering stem.
     _o(pen)
     rect(pen, 425, 0, 505, M.x_height)
     rect(pen, 425, -10, 540, 70)
 
 
 def _g(pen: TTGlyphPen) -> None:
-    # Single-storey g keeps the lowercase system compact and recognisable.
     _o(pen)
     rect(pen, 425, -145, 505, M.x_height)
     rect(pen, 270, -200, 505, -120)
     thick_segment(pen, 270, -200, 190, -145, 65)
 
 
-def _open_round(pen: TTGlyphPen, *, top: int, bottom: int, crossbar: bool = False) -> None:
-    """Open octagonal bowl used by C/c/e/G families."""
-    s = M.stroke
-    x0, x1 = 95, 505
-    c = 88
-    rect(pen, x0, bottom + c, x0 + s, top - c)
-    rect(pen, x0 + c, top - s, x1 - 15, top)
-    rect(pen, x0 + c, bottom, x1 - 15, bottom + s)
-    thick_segment(pen, x0 + 35, top - 35, x0 + c + 18, top - s / 2, s)
-    thick_segment(pen, x0 + 35, bottom + 35, x0 + c + 18, bottom + s / 2, s)
+def _open_bowl(pen: TTGlyphPen, *, top: int, bottom: int, crossbar: bool = False) -> None:
+    height = top - bottom
+    is_upper = height > 600
+    x0, x1 = (75, 525) if is_upper else (95, 505)
+    corner = 115 if is_upper else M.corner
+    open_octagonal_bowl(
+        pen,
+        x0,
+        bottom,
+        x1,
+        top,
+        stroke=M.stroke,
+        corner=corner,
+        opening="right",
+    )
     if crossbar:
-        rect(pen, x0 + 25, (top + bottom) / 2 - s / 2, 470, (top + bottom) / 2 + s / 2)
+        mid = (top + bottom) / 2
+        rect(pen, x0 + M.stroke - 20, mid - M.stroke / 2, x1 - 20, mid + M.stroke / 2)
 
 
 def _C(pen: TTGlyphPen) -> None:
-    _open_round(pen, top=M.cap_height + M.overshoot, bottom=-M.overshoot)
+    _open_bowl(pen, top=M.cap_height + M.overshoot, bottom=-M.overshoot)
 
 
 def _c(pen: TTGlyphPen) -> None:
-    _open_round(pen, top=M.x_height + M.overshoot, bottom=-M.overshoot)
+    _open_bowl(pen, top=M.x_height + M.overshoot, bottom=-M.overshoot)
 
 
 def _e(pen: TTGlyphPen) -> None:
-    # Deliberately open right side: the eye and aperture stay clear at text size.
-    _open_round(pen, top=M.x_height + M.overshoot, bottom=-M.overshoot, crossbar=True)
+    _open_bowl(pen, top=M.x_height + M.overshoot, bottom=-M.overshoot, crossbar=True)
 
 
 def _G(pen: TTGlyphPen) -> None:
     _C(pen)
-    s = M.stroke
-    rect(pen, 320, 300, M.right, 300 + s)
-    rect(pen, M.right - s, 0, M.right, 340)
+    rect(pen, 305, 300, 505, 380)
+    rect(pen, 425, 170, 505, 380)
 
 
 def _T(pen: TTGlyphPen) -> None:
@@ -148,40 +149,56 @@ def _T(pen: TTGlyphPen) -> None:
 def _Z(pen: TTGlyphPen) -> None:
     s = M.stroke
     rect(pen, M.left, M.cap_height - s, M.right, M.cap_height)
-    thick_segment(pen, M.right - 30, M.cap_height - 40, M.left + 30, 40, s)
+    thick_segment(pen, M.right - 30, M.cap_height - 40, M.left + 30, 40, 88)
     rect(pen, M.left, 0, M.right, s)
 
 
-def _segmented_s(pen: TTGlyphPen, top: int) -> None:
-    s = M.stroke
-    mid = top // 2
-    rect(pen, 135, top - s, 470, top)
-    rect(pen, 130, mid - s / 2, 470, mid + s / 2)
-    rect(pen, 130, 0, 465, s)
-    rect(pen, 95, mid + 5, 175, top - 80)
-    rect(pen, 425, 80, 505, mid - 5)
-    thick_segment(pen, 135, top - 80, 185, top - 30, 62)
-    thick_segment(pen, 415, 30, 465, 80, 62)
+def _rounded_s(pen: TTGlyphPen, top: int) -> None:
+    mid = top / 2
+    if top > 600:
+        x0, x1, stroke, corner, overlap = 95, 505, 72, 92, 28
+    else:
+        x0, x1, stroke, corner, overlap = 105, 495, 68, 78, 22
+    open_octagonal_bowl(
+        pen,
+        x0,
+        mid - overlap,
+        x1,
+        top + M.overshoot,
+        stroke=stroke,
+        corner=corner,
+        opening="right",
+    )
+    open_octagonal_bowl(
+        pen,
+        x0,
+        -M.overshoot,
+        x1,
+        mid + overlap,
+        stroke=stroke,
+        corner=corner,
+        opening="left",
+    )
 
 
 def _S(pen: TTGlyphPen) -> None:
-    _segmented_s(pen, M.cap_height)
+    _rounded_s(pen, M.cap_height)
 
 
 def _s(pen: TTGlyphPen) -> None:
-    _segmented_s(pen, M.x_height)
+    _rounded_s(pen, M.x_height)
 
 
 def _V(pen: TTGlyphPen) -> None:
-    thick_segment(pen, 105, M.cap_height, M.center, 0, M.stroke)
-    thick_segment(pen, M.center, 0, 495, M.cap_height, M.stroke)
+    thick_segment(pen, 105, M.cap_height, M.center, 0, 90)
+    thick_segment(pen, M.center, 0, 495, M.cap_height, 90)
 
 
 def _W(pen: TTGlyphPen) -> None:
-    w = 72
+    w = 84
     thick_segment(pen, 70, M.cap_height, 195, 0, w)
-    thick_segment(pen, 195, 0, M.center, 410, w)
-    thick_segment(pen, M.center, 410, 405, 0, w)
+    thick_segment(pen, 195, 0, M.center, 280, w)
+    thick_segment(pen, M.center, 280, 405, 0, w)
     thick_segment(pen, 405, 0, 530, M.cap_height, w)
 
 
@@ -202,12 +219,9 @@ def _u(pen: TTGlyphPen) -> None:
 
 
 # --- Numerals -------------------------------------------------------------
-# v0 numerals share a segmented technical skeleton. The family can be softened
-# later without changing widths or codepoint coverage.
 
 
 def _digit_two(pen: TTGlyphPen) -> None:
-    s = M.stroke
     rect(pen, 120, 620, 470, 700)
     rect(pen, 425, 350, 505, 625)
     rect(pen, 130, 310, 470, 390)
@@ -216,7 +230,6 @@ def _digit_two(pen: TTGlyphPen) -> None:
 
 
 def _digit_three(pen: TTGlyphPen) -> None:
-    s = M.stroke
     rect(pen, 120, 620, 465, 700)
     rect(pen, 135, 310, 465, 390)
     rect(pen, 120, 0, 465, 80)
@@ -248,7 +261,7 @@ def _digit_six(pen: TTGlyphPen) -> None:
 
 def _digit_seven(pen: TTGlyphPen) -> None:
     rect(pen, 105, 620, 495, 700)
-    thick_segment(pen, 455, 635, 225, 0, M.stroke)
+    thick_segment(pen, 455, 635, 225, 0, 86)
 
 
 def _digit_eight(pen: TTGlyphPen) -> None:
@@ -271,7 +284,6 @@ def _diaeresis(pen: TTGlyphPen, y: int) -> None:
 
 
 def _breve(pen: TTGlyphPen, y: int) -> None:
-    # Angular breve echoes the font's engineered corners without becoming a caret.
     s = 54
     thick_segment(pen, 205, y + 35, 265, y, s)
     thick_segment(pen, 265, y, 335, y, s)
@@ -279,9 +291,8 @@ def _breve(pen: TTGlyphPen, y: int) -> None:
 
 
 def _cedilla(pen: TTGlyphPen) -> None:
-    s = 54
-    thick_segment(pen, 310, 15, 275, -80, s)
-    thick_segment(pen, 275, -80, 345, -125, s)
+    thick_segment(pen, 310, 15, 275, -80, 54)
+    thick_segment(pen, 275, -80, 345, -125, 54)
 
 
 def _with(base: Draw, accent: Callable[[TTGlyphPen], None]) -> Draw:
@@ -409,10 +420,11 @@ def _greater(pen: TTGlyphPen) -> None:
 
 
 def _lira(pen: TTGlyphPen) -> None:
-    rect(pen, 245, 0, 325, 700)
-    thick_segment(pen, 170, 470, 415, 570, 52)
-    thick_segment(pen, 170, 350, 415, 450, 52)
-    thick_segment(pen, 285, 35, 470, 190, 72)
+    thick_segment(pen, 235, 40, 285, 700, 72)
+    thick_segment(pen, 165, 500, 420, 585, 50)
+    thick_segment(pen, 160, 375, 410, 460, 50)
+    rect(pen, 235, 35, 345, 105)
+    thick_segment(pen, 335, 70, 470, 195, 68)
 
 
 def _sup_two(pen: TTGlyphPen) -> None:
@@ -442,7 +454,6 @@ def glyph_name(ch: str) -> str:
     return f"uni{ord(ch):04X}"
 
 
-# Diagnostic repertoire. Expansion should happen only after these families settle.
 DRAWERS: dict[str, Draw | None] = {
     " ": None,
     "H": _H, "I": _I, "O": _O, "C": _C, "G": _G, "S": _S,
