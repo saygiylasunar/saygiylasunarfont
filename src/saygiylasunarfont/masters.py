@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 
@@ -8,7 +8,7 @@ from .config import CORE_UNIT, M
 from .constraints import DYADIC_AXES, TRIHEX_AXES, PointRole
 from .curvature import BOWL_DNA, ResolvedCurve, resolve_curve
 from .geometry import axis_segment, profiled_ring
-from .moldcaster import DECIMAL_10, DYADIC_32, TRIHEX_36, Mold, Moldcaster
+from .moldcaster import DYADIC_32, TRIHEX_36, Mold, Moldcaster
 from .solver import ConstructionSolver
 
 
@@ -159,8 +159,8 @@ class O0Master:
             quantum = target_cell / mold.finest_division
             slash_width = max(quantum, round(slash_width / quantum) * quantum)
 
-        return O0Instance(
-            **{**instance.__dict__},
+        return replace(
+            instance,
             slash_angle=slash_angle,
             slash_length=slash_length,
             slash_width=slash_width,
