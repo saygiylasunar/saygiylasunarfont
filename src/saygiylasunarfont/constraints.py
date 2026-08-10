@@ -57,6 +57,26 @@ class AngleFamily:
 
 DOCUMENT_AXES = AngleFamily("document", (0.0, 90.0))
 TRIHEX_AXES = AngleFamily("trihex", (30.0, 60.0, 120.0, 150.0))
+
+# Base-10 work naturally privileges factors 2 and 5. Rather than inventing a
+# decorative decimal angle, derive canonical slopes from small integer ratios:
+# 1:2 and 2:5, together with their complements and mirrors.
+_decimal_1_2 = math.degrees(math.atan2(1.0, 2.0))
+_decimal_2_5 = math.degrees(math.atan2(2.0, 5.0))
+DECIMAL_AXES = AngleFamily(
+    "decimal",
+    (
+        _decimal_2_5,
+        _decimal_1_2,
+        90.0 - _decimal_1_2,
+        90.0 - _decimal_2_5,
+        90.0 + _decimal_2_5,
+        90.0 + _decimal_1_2,
+        180.0 - _decimal_1_2,
+        180.0 - _decimal_2_5,
+    ),
+)
+
 DYADIC_AXES = AngleFamily("dyadic", (45.0, 135.0))
 
 
