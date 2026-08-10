@@ -53,13 +53,15 @@ class FlowMaster:
     source_stroke: float = M.stroke
     source_overshoot: float = M.overshoot
 
-    # Uppercase amplitude is exactly six 36-core units. Lowercase uses a half
-    # core optical correction while remaining visibly derived from the same mold.
-    upper_amplitude: float = 6 * CORE_UNIT
-    lower_amplitude: float = 5.5 * CORE_UNIT
-    upper_harmonic_mix: float = 0.74
-    lower_harmonic_mix: float = 0.70
-    stiffness_gain: float = 0.66
+    # Optical review showed that the first harmonic S exposed its mathematics
+    # too strongly. Keep the third harmonic, but give it less authority while
+    # increasing the continuous stiffness transform. Quarter-core amplitude
+    # corrections widen the silhouette without abandoning the 36-core mold.
+    upper_amplitude: float = 6.25 * CORE_UNIT
+    lower_amplitude: float = 5.75 * CORE_UNIT
+    upper_harmonic_mix: float = 0.66
+    lower_harmonic_mix: float = 0.62
+    stiffness_gain: float = 0.76
 
     def _solver(self) -> ConstructionSolver:
         return ConstructionSolver(Moldcaster(self.source_cell))
@@ -77,15 +79,12 @@ class FlowMaster:
         lowercase: bool,
     ) -> float:
         source_right = self.source_cell / 2.0 + source_amplitude
-        # The uppercase terminal can participate strongly in the native lattice.
-        # Lowercase retains greater optical freedom so x-height forms do not look
-        # like mechanically scaled capitals.
         solved_right = self._solver().solve_coordinate(
             source_right,
             target_span=target_cell,
             mold=mold,
             role=PointRole.TERMINAL,
-            strength_scale=0.25 if lowercase else 0.72,
+            strength_scale=0.22 if lowercase else 0.62,
         )
         return solved_right - target_cell / 2.0
 
@@ -155,8 +154,8 @@ class FlowMaster:
             harmonic_mix=instance.harmonic_mix,
             stiffness=instance.stiffness,
             steps=88,
-            terminal_relief=0.015,
-            diagonal_compensation=0.015,
+            terminal_relief=0.010,
+            diagonal_compensation=0.012,
         )
 
     def draw(self, pen: TTGlyphPen, kind: str) -> None:
