@@ -49,7 +49,10 @@ class NumericMaster:
     two_join_outer_stroke: float = 1.0 / 3.0
     two_join_control_stroke: float = 1.0 / 6.0
     two_transition_stroke_ratio: float = 24.0 / 25.0
-    three_left_core: float = 4.0
+    # Digit 3 occupies x=[1/3, 5/6] of the mono cell. Therefore its center is
+    # 7/12 and its half-amplitude is 1/4 of the cell: a right-weighted numeric
+    # field that remains mathematically related to the 18-core construction.
+    three_left_core: float = 6.0
     three_right_core: float = 15.0
     three_stiffness_gain: float = 1.0 / 3.0
     three_terminal_relief: float = 1.0 / 40.0
