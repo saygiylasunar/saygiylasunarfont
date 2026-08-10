@@ -30,15 +30,21 @@ def test_a_is_single_storey_body_plus_stem_and_restrained_foot() -> None:
     assert a.x1 < a.foot_right < a.cell
 
 
-def test_g_extends_same_stem_into_compact_descender_hook() -> None:
+def test_g_extends_same_stem_into_one_continuous_quadratic_hook() -> None:
     g = LOWER_CLOSED_MASTER.resolve("g")
     assert g.stem_x0 is not None
     assert g.descender_bottom is not None
-    assert g.hook_left is not None
+    assert g.hook_start_y is not None
     assert g.terminal_left is not None
     assert g.descender_bottom < 0.0
     assert M.descender < g.descender_bottom
-    assert g.terminal_left < g.hook_left < g.stem_x0 < g.x1
+    assert g.terminal_left < g.stem_x0 < g.x1
+    assert g.descender_bottom < g.hook_start_y < 0.0
+    assert math.isclose(
+        g.hook_start_y - g.descender_bottom,
+        g.stroke * LOWER_CLOSED_MASTER.g_hook_start_strokes,
+        abs_tol=1e-9,
+    )
 
 
 def test_decimal_cast_preserves_lowercase_body_ratio() -> None:
@@ -49,7 +55,6 @@ def test_decimal_cast_preserves_lowercase_body_ratio() -> None:
         target_body_height=100 * M.x_height / M.advance,
         mold=DECIMAL_10,
     )
-    # Mold attraction is allowed to move extrema, but symmetry and order remain.
     assert math.isclose(decimal.x0 + decimal.x1, 100.0, abs_tol=1e-9)
     assert decimal.x0 < 50.0 < decimal.x1
     assert native.x0 < native.cell / 2.0 < native.x1
