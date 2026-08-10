@@ -1,19 +1,16 @@
 from __future__ import annotations
 
+from .accentmasters import (
+    lower_breve,
+    lower_diaeresis,
+    upper_breve,
+    upper_diaeresis,
+    upper_dot,
+    with_cedilla,
+)
 from .diagonalmasters import draw_V, draw_W, draw_Z
 from .flowmasters import draw_S, draw_s
-from .glyphs import (
-    DRAWERS as LEGACY_DRAWERS,
-    _cedilla,
-    _glyph,
-    _lower_breve,
-    _lower_diaeresis,
-    _notdef,
-    _upper_breve,
-    _upper_diaeresis,
-    _with,
-    glyph_name,
-)
+from .glyphs import DRAWERS as LEGACY_DRAWERS, _glyph, _notdef, glyph_name
 from .lowermasters import draw_a, draw_g, draw_o
 from .masters import draw_O, draw_zero
 from .numericmasters import draw_2, draw_3, draw_5, draw_6, draw_9
@@ -21,28 +18,28 @@ from .openmasters import draw_C, draw_G, draw_c, draw_e
 
 
 # Staged migration registry. Legacy glyph definitions remain intact until their
-# family gate is promoted. This keeps each geometric migration isolated and easy
-# to audit or revert.
+# family gate is promoted. Accent composition is already normalized separately,
+# including characters whose base body still comes from the legacy diagnostic set.
 DRAWERS = dict(LEGACY_DRAWERS)
 DRAWERS.update(
     {
         # Gate 1 — closed round / ambiguity
         "O": draw_O,
         "0": draw_zero,
-        "Ö": _upper_diaeresis(draw_O),
+        "Ö": upper_diaeresis(draw_O),
         # Gate 2 — open round / aperture
         "C": draw_C,
         "G": draw_G,
         "c": draw_c,
         "e": draw_e,
-        "Ç": _with(draw_C, _cedilla),
-        "Ğ": _upper_breve(draw_G),
-        "ç": _with(draw_c, _cedilla),
+        "Ç": with_cedilla(draw_C),
+        "Ğ": upper_breve(draw_G),
+        "ç": with_cedilla(draw_c),
         # Gate 3 — continuous harmonic flow
         "S": draw_S,
         "s": draw_s,
-        "Ş": _with(draw_S, _cedilla),
-        "ş": _with(draw_s, _cedilla),
+        "Ş": with_cedilla(draw_S),
+        "ş": with_cedilla(draw_s),
         # Gate 4 — decimal / digital numeric derivatives
         "2": draw_2,
         "3": draw_3,
@@ -57,8 +54,12 @@ DRAWERS.update(
         "a": draw_a,
         "o": draw_o,
         "g": draw_g,
-        "ö": _lower_diaeresis(draw_o),
-        "ğ": _lower_breve(draw_g),
+        "ö": lower_diaeresis(draw_o),
+        "ğ": lower_breve(draw_g),
+        # Accent normalization on not-yet-migrated base bodies
+        "İ": upper_dot(LEGACY_DRAWERS["I"]),
+        "Ü": upper_diaeresis(LEGACY_DRAWERS["U"]),
+        "ü": lower_diaeresis(LEGACY_DRAWERS["u"]),
     }
 )
 
@@ -72,6 +73,8 @@ MIGRATED_GLYPHS = frozenset(
         "a", "o", "g", "ö", "ğ",
     }
 )
+
+NORMALIZED_ACCENTS = frozenset({"Ç", "Ğ", "İ", "Ö", "Ş", "Ü", "ç", "ğ", "ö", "ş", "ü"})
 
 
 def build_glyphs() -> tuple[list[str], dict[str, object], dict[int, str]]:
