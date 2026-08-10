@@ -38,7 +38,7 @@ def test_two_transition_uses_rational_optical_join_parameters() -> None:
     assert math.isclose(NUMERIC_MASTER.two_transition_stroke_ratio, 24.0 / 25.0)
 
 
-def test_three_uses_one_continuous_two_lobe_flow_with_reduced_stiffness() -> None:
+def test_three_uses_one_continuous_right_weighted_two_lobe_field() -> None:
     values = [
         periodic_flow_unit(t, lobes=2, polarity=-1.0, stiffness=2.1)
         for t in (0, 0.25, 0.5, 0.75, 1)
@@ -46,9 +46,15 @@ def test_three_uses_one_continuous_two_lobe_flow_with_reduced_stiffness() -> Non
     expected = (-1.0, 1.0, -1.0, 1.0, -1.0)
     for value, target in zip(values, expected):
         assert math.isclose(value, target, abs_tol=1e-9)
+
     assert math.isclose(NUMERIC_MASTER.three_stiffness_gain, 1.0 / 3.0)
-    assert NUMERIC_MASTER.three_left_core > 3.0
-    assert NUMERIC_MASTER.three_right_core == 15.0
+    assert math.isclose(NUMERIC_MASTER.three_left_core, 6.0)
+    assert math.isclose(NUMERIC_MASTER.three_right_core, 15.0)
+
+    center_core = (NUMERIC_MASTER.three_left_core + NUMERIC_MASTER.three_right_core) / 2.0
+    amplitude_core = (NUMERIC_MASTER.three_right_core - NUMERIC_MASTER.three_left_core) / 2.0
+    assert math.isclose(center_core / 18.0, 7.0 / 12.0)
+    assert math.isclose(amplitude_core / 18.0, 1.0 / 4.0)
 
 
 def test_numeric_profiles_keep_open_and_ring_forms_related_but_distinct() -> None:
