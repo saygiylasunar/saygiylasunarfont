@@ -31,7 +31,8 @@ def test_W_skeleton_is_exactly_mirrored() -> None:
     assert math.isclose(p0[0] + p4[0], ctx.cell, abs_tol=1e-9)
     assert math.isclose(p1[0] + p3[0], ctx.cell, abs_tol=1e-9)
     assert math.isclose(p2[0], ctx.cell / 2.0, abs_tol=1e-9)
-    assert math.isclose(p2[1], ctx.body_height * 0.4, abs_tol=1e-9)
+    assert math.isclose(p2[1], ctx.body_height * 0.45, abs_tol=1e-9)
+    assert math.isclose(p2[1], 9 * CORE_UNIT, abs_tol=1e-9)
     assert p0[1] == p4[1] == ctx.body_height
     assert p1[1] == p3[1] == 0.0
 
