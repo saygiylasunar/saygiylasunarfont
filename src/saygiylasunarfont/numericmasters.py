@@ -8,7 +8,8 @@ from fontTools.pens.ttGlyphPen import TTGlyphPen
 from .config import CORE_UNIT, M
 from .constraints import DECIMAL_AXES, DYADIC_AXES, TRIHEX_AXES, PointRole
 from .curvature import NUMERIC_DNA, ResolvedCurve, resolve_curve
-from .geometry import axis_segment, profiled_open_bowl, profiled_ring, rect, thick_segment
+from .flowcurve import stroked_periodic_flow_outline
+from .geometry import axis_segment, polygon, profiled_open_bowl, profiled_ring, rect, thick_segment
 from .moldcaster import DECIMAL_10, DYADIC_32, TRIHEX_36, Mold, Moldcaster
 from .solver import ConstructionSolver
 
@@ -96,9 +97,6 @@ class NumericMaster:
         open_profile = resolve_curve(NUMERIC_OPEN_DNA, cell=target_cell, stroke=stroke)
         ring_profile = resolve_curve(NUMERIC_RING_DNA, cell=target_cell, stroke=stroke)
 
-        # The diagonal in 2 is seeded by a 12:8 core displacement. The target
-        # medium may attract it toward trihex, decimal integer-ratio or dyadic
-        # axes without changing the source construction.
         seed_angle = math.degrees(math.atan2(8.0, 12.0))
         two_angle = self._solver().solve_angle(
             seed_angle,
@@ -132,7 +130,6 @@ class NumericMaster:
             opening="left",
             steps=52,
         )
-
         cx = ctx.cell / 2.0
         cy = self._y(6.0, ctx=ctx)
         dx = self._x(15.0, ctx=ctx) - self._x(3.0, ctx=ctx)
@@ -145,42 +142,26 @@ class NumericMaster:
             ctx.two_diagonal_angle,
             ctx.stroke,
         )
-        rect(
-            pen,
-            self._x(2.0, ctx=ctx),
-            0.0,
-            self._x(16.0, ctx=ctx),
-            ctx.stroke,
-        )
+        rect(pen, self._x(2.0, ctx=ctx), 0.0, self._x(16.0, ctx=ctx), ctx.stroke)
 
     def draw_three(self, pen: TTGlyphPen, ctx: NumericContext) -> None:
-        x0 = self._x(2.5, ctx=ctx, role=PointRole.BOWL_EXTREMUM, strength_scale=0.36)
-        x1 = self._x(16.0, ctx=ctx, role=PointRole.BOWL_EXTREMUM)
-        mid = ctx.body_height / 2.0
+        left = self._x(2.0, ctx=ctx, role=PointRole.TERMINAL, strength_scale=0.48)
+        right = self._x(16.0, ctx=ctx, role=PointRole.BOWL_EXTREMUM)
         over = self._overshoot(ctx=ctx)
-        overlap = ctx.stroke * 0.16
-        profiled_open_bowl(
-            pen,
-            x0,
-            mid - overlap,
-            x1,
-            ctx.body_height + over,
+        points = stroked_periodic_flow_outline(
+            center_x=(left + right) / 2.0,
+            top=ctx.body_height + over,
+            bottom=-over,
+            amplitude=(right - left) / 2.0,
             stroke=ctx.stroke,
-            profile=ctx.open_profile,
-            opening="left",
-            steps=48,
+            lobes=2,
+            polarity=-1.0,
+            stiffness=ctx.open_profile.exponent * 0.58,
+            steps=112,
+            terminal_relief=0.015,
+            diagonal_compensation=0.015,
         )
-        profiled_open_bowl(
-            pen,
-            x0,
-            -over,
-            x1,
-            mid + overlap,
-            stroke=ctx.stroke,
-            profile=ctx.open_profile,
-            opening="left",
-            steps=48,
-        )
+        polygon(pen, points, clockwise=True)
 
     def draw_five(self, pen: TTGlyphPen, ctx: NumericContext) -> None:
         left = self._x(2.0, ctx=ctx)
@@ -215,13 +196,7 @@ class NumericMaster:
             profile=ctx.ring_profile,
             steps=52,
         )
-        rect(
-            pen,
-            left,
-            self._y(6.0, ctx=ctx),
-            stem_right,
-            self._y(17.0, ctx=ctx),
-        )
+        rect(pen, left, self._y(6.0, ctx=ctx), stem_right, self._y(17.0, ctx=ctx))
         thick_segment(
             pen,
             (left + stem_right) / 2.0,
@@ -246,13 +221,7 @@ class NumericMaster:
             profile=ctx.ring_profile,
             steps=52,
         )
-        rect(
-            pen,
-            stem_left,
-            self._y(3.0, ctx=ctx),
-            right,
-            self._y(14.0, ctx=ctx),
-        )
+        rect(pen, stem_left, self._y(3.0, ctx=ctx), right, self._y(14.0, ctx=ctx))
         thick_segment(
             pen,
             (stem_left + right) / 2.0,
