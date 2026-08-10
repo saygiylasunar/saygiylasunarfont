@@ -6,12 +6,15 @@ from .glyphs import (
     DRAWERS as LEGACY_DRAWERS,
     _cedilla,
     _glyph,
+    _lower_breve,
+    _lower_diaeresis,
     _notdef,
     _upper_breve,
     _upper_diaeresis,
     _with,
     glyph_name,
 )
+from .lowermasters import draw_a, draw_g, draw_o
 from .masters import draw_O, draw_zero
 from .numericmasters import draw_2, draw_3, draw_5, draw_6, draw_9
 from .openmasters import draw_C, draw_G, draw_c, draw_e
@@ -50,6 +53,12 @@ DRAWERS.update(
         "V": draw_V,
         "W": draw_W,
         "Z": draw_Z,
+        # Gate 6 — lowercase closed family
+        "a": draw_a,
+        "o": draw_o,
+        "g": draw_g,
+        "ö": _lower_diaeresis(draw_o),
+        "ğ": _lower_breve(draw_g),
     }
 )
 
@@ -60,6 +69,7 @@ MIGRATED_GLYPHS = frozenset(
         "S", "s", "Ş", "ş",
         "2", "3", "5", "6", "9",
         "V", "W", "Z",
+        "a", "o", "g", "ö", "ğ",
     }
 )
 
