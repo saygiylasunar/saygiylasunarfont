@@ -41,6 +41,20 @@ class NumericMaster:
     source_stroke: float = M.stroke
     source_overshoot: float = M.overshoot
 
+    # Optical review parameters are kept dimensionless/rational so later weights
+    # and molds derive the same gesture instead of preserving absolute fixes.
+    two_join_y_core: float = 13.0
+    two_control_y_core: float = 21.0 / 2.0
+    two_end_y_core: float = 2.0
+    two_join_outer_stroke: float = 1.0 / 3.0
+    two_join_control_stroke: float = 1.0 / 6.0
+    two_transition_stroke_ratio: float = 24.0 / 25.0
+    three_left_core: float = 4.0
+    three_right_core: float = 15.0
+    three_stiffness_gain: float = 1.0 / 3.0
+    three_terminal_relief: float = 1.0 / 40.0
+    three_diagonal_compensation: float = 1.0 / 80.0
+
     def _solver(self) -> ConstructionSolver:
         return ConstructionSolver(Moldcaster(self.source_cell))
 
@@ -132,27 +146,38 @@ class NumericMaster:
             steps=52,
         )
 
-        # A quadratic transition replaces the former independent diagonal. It
-        # leaves the bowl's lower-right shoulder almost vertically and then
-        # turns toward the baseline, visually approaching G1 continuity while
-        # preserving the moldable source proportions.
         diagonal = stroked_quadratic_outline(
-            (x1 - ctx.stroke * 0.32, self._y(13.0, ctx=ctx)),
-            (x1 - ctx.stroke * 0.16, self._y(10.4, ctx=ctx)),
-            (self._x(3.0, ctx=ctx, role=PointRole.TERMINAL, strength_scale=0.34), self._y(2.0, ctx=ctx)),
-            stroke=ctx.stroke * 0.96,
+            (
+                x1 - ctx.stroke * self.two_join_outer_stroke,
+                self._y(self.two_join_y_core, ctx=ctx),
+            ),
+            (
+                x1 - ctx.stroke * self.two_join_control_stroke,
+                self._y(self.two_control_y_core, ctx=ctx),
+            ),
+            (
+                self._x(3.0, ctx=ctx, role=PointRole.TERMINAL, strength_scale=0.34),
+                self._y(self.two_end_y_core, ctx=ctx),
+            ),
+            stroke=ctx.stroke * self.two_transition_stroke_ratio,
             steps=36,
         )
         polygon(pen, diagonal, clockwise=True)
         rect(pen, self._x(2.0, ctx=ctx), 0.0, self._x(16.0, ctx=ctx), ctx.stroke)
 
     def draw_three(self, pen: TTGlyphPen, ctx: NumericContext) -> None:
-        # Optical review showed that the first periodic 3 inherited too much of
-        # the S gesture. Keep one continuous two-lobe equation, but reduce the
-        # stiffness and pull the left terminals/notch inward. Right lobes remain
-        # dominant, which restores numeric recognition without abandoning flow.
-        left = self._x(4.0, ctx=ctx, role=PointRole.TERMINAL, strength_scale=0.30)
-        right = self._x(15.0, ctx=ctx, role=PointRole.BOWL_EXTREMUM, strength_scale=0.42)
+        left = self._x(
+            self.three_left_core,
+            ctx=ctx,
+            role=PointRole.TERMINAL,
+            strength_scale=0.30,
+        )
+        right = self._x(
+            self.three_right_core,
+            ctx=ctx,
+            role=PointRole.BOWL_EXTREMUM,
+            strength_scale=0.42,
+        )
         over = self._overshoot(ctx=ctx)
         points = stroked_periodic_flow_outline(
             center_x=(left + right) / 2.0,
@@ -162,10 +187,10 @@ class NumericMaster:
             stroke=ctx.stroke,
             lobes=2,
             polarity=-1.0,
-            stiffness=ctx.open_profile.exponent * 0.34,
+            stiffness=ctx.open_profile.exponent * self.three_stiffness_gain,
             steps=112,
-            terminal_relief=0.025,
-            diagonal_compensation=0.012,
+            terminal_relief=self.three_terminal_relief,
+            diagonal_compensation=self.three_diagonal_compensation,
         )
         polygon(pen, points, clockwise=True)
 
