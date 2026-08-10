@@ -57,9 +57,9 @@ class FlowMaster:
     # core optical correction while remaining visibly derived from the same mold.
     upper_amplitude: float = 6 * CORE_UNIT
     lower_amplitude: float = 5.5 * CORE_UNIT
-    upper_harmonic_mix: float = 0.72
-    lower_harmonic_mix: float = 0.68
-    stiffness_gain: float = 0.60
+    upper_harmonic_mix: float = 0.74
+    lower_harmonic_mix: float = 0.70
+    stiffness_gain: float = 0.66
 
     def _solver(self) -> ConstructionSolver:
         return ConstructionSolver(Moldcaster(self.source_cell))
@@ -155,8 +155,8 @@ class FlowMaster:
             harmonic_mix=instance.harmonic_mix,
             stiffness=instance.stiffness,
             steps=88,
-            terminal_relief=0.025,
-            diagonal_compensation=0.025,
+            terminal_relief=0.015,
+            diagonal_compensation=0.015,
         )
 
     def draw(self, pen: TTGlyphPen, kind: str) -> None:
