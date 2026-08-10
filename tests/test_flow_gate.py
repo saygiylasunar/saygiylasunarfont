@@ -24,12 +24,28 @@ def test_harmonic_flow_has_odd_mirror_symmetry() -> None:
 
 
 def test_third_harmonic_creates_two_shoulders_near_thirds() -> None:
-    # Derivative sign changes bracket one shoulder around 1/3 and the mirrored
-    # shoulder around 2/3. This is structural, not a hand-placed Bezier handle.
     assert harmonic_flow_derivative(0.34) < 0.0
     assert harmonic_flow_derivative(0.36) > 0.0
     assert harmonic_flow_derivative(0.64) > 0.0
     assert harmonic_flow_derivative(0.66) < 0.0
+
+
+def test_optical_S_holds_terminal_longer_before_quieter_turn() -> None:
+    upper = FLOW_MASTER.resolve("S")
+    one_eighth = harmonic_flow_unit(
+        1.0 / 8.0,
+        harmonic_mix=upper.harmonic_mix,
+        stiffness=upper.stiffness,
+    )
+    one_quarter = harmonic_flow_unit(
+        1.0 / 4.0,
+        harmonic_mix=upper.harmonic_mix,
+        stiffness=upper.stiffness,
+    )
+    # Specimen review asked for less visible sine-wave motion: the terminal side
+    # holds near the extremum, while the quarter-height turn is less aggressive.
+    assert one_eighth > 0.90
+    assert -0.65 < one_quarter < 0.0
 
 
 def test_S_and_s_are_one_family_with_optical_lowercase_relaxation() -> None:
