@@ -98,4 +98,4 @@ L = Lattice(M.advance)
 FAMILY_NAME = "Saygıyla Sunar Mono"
 STYLE_NAME = "Regular"
 POSTSCRIPT_NAME = "SaygiylaSunarMono-Regular"
-VERSION = "0.4.0"
+VERSION = "0.5.0"
