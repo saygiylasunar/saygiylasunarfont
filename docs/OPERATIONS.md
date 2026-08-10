@@ -2,9 +2,10 @@
 
 ## Status
 
-The preparatory architecture is complete and the **six diagnostic DNA gates are
-master candidates**. This is not a release freeze; it is the point at which the
-font has enough proven family grammar to expand deliberately.
+The preparatory architecture is complete, the **six diagnostic DNA gates are
+master candidates**, and Turkish accent normalization has passed. This is not a
+release freeze; it is the clean checkpoint from which the alphabet can expand by
+structural family rather than by ad-hoc glyph drawing.
 
 CI currently validates:
 
@@ -15,7 +16,7 @@ CI currently validates:
 - documentary, trihex, decimal-factor and dyadic angle families;
 - role-based constraint hierarchy and fit constraints;
 - strict monospaced metrics;
-- Turkish source-level repertoire;
+- Turkish source-level repertoire and normalized accent bounds;
 - deterministic TTF build and audit.
 
 ## Diagnostic gates
@@ -94,14 +95,21 @@ behavior.
 - lowercase body sharing is tested directly, not merely judged visually;
 - Decimal-10 symmetry and Dyadic-32 stroke quantization remain valid.
 
-## Accent normalization — NEXT
+## Accent normalization — PASSED
 
-The base bodies of Turkish glyphs have migrated, but legacy diaeresis, breve,
-cedilla and dotted-I accent geometry is not yet optically locked. Normalize those
-accents before broad alphabet expansion so Turkish remains source-level rather
-than a late patch.
+`Ç Ğ İ Ö Ş Ü ç ğ ö ş ü`
 
-## Expansion after accents
+- diaeresis and dotted-I use one core-derived rounded-dot system;
+- breve is a stroked quadratic centerline rather than a three-segment legacy
+  approximation;
+- cedilla is one stroked quadratic hook rather than two disconnected segments;
+- cap accents are mathematically bounded below the global ascender;
+- cedilla geometry is mathematically bounded above the global descender;
+- accented glyph clipping is checked against the built TTF in CI;
+- normalized accents can already compose with legacy bodies such as I/U/u while
+  those bodies wait for their own family migration.
+
+## Expansion — NEXT
 
 Expand by structural families rather than alphabetic order:
 
