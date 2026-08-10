@@ -45,6 +45,10 @@ class LowerClosedMaster:
     source_overshoot: float = M.overshoot
     source_inset: float = 2.5 * CORE_UNIT
     descender_depth: float = 4.5 * CORE_UNIT
+    g_terminal_core: float = 21.0 / 4.0
+    g_hook_start_strokes: float = 9.0 / 8.0
+    g_terminal_rise_strokes: float = 3.0 / 4.0
+    g_hook_stroke_ratio: float = 13.0 / 16.0
 
     def _solver(self) -> ConstructionSolver:
         return ConstructionSolver(Moldcaster(self.source_cell))
@@ -143,13 +147,13 @@ class LowerClosedMaster:
             target_body_height,
         )
         terminal_left = self._resolve_x(
-            5.2 * CORE_UNIT,
+            self.g_terminal_core * CORE_UNIT,
             target_cell=target_cell,
             mold=mold,
             role=PointRole.TERMINAL,
             strength_scale=0.14,
         )
-        hook_start_y = descender_bottom + stroke * 1.10
+        hook_start_y = descender_bottom + stroke * self.g_hook_start_strokes
         return LowerClosedInstance(
             **{
                 **instance.__dict__,
@@ -194,21 +198,21 @@ class LowerClosedMaster:
         assert inst.terminal_left is not None
 
         stem_center = (inst.stem_x0 + inst.x1) / 2.0
-        # The old rect+segment hook produced a diamond at the overlap. One
-        # quadratic centerline now leaves the vertical stem with a vertical
-        # tangent and turns continuously into the terminal.
         rect(
             pen,
             inst.stem_x0,
-            inst.hook_start_y - inst.stroke * 0.55,
+            inst.hook_start_y - inst.stroke * (9.0 / 16.0),
             inst.x1,
             inst.body_height,
         )
         hook = stroked_quadratic_outline(
             (stem_center, inst.hook_start_y),
             (stem_center, inst.descender_bottom),
-            (inst.terminal_left, inst.descender_bottom + inst.stroke * 0.72),
-            stroke=inst.stroke * 0.82,
+            (
+                inst.terminal_left,
+                inst.descender_bottom + inst.stroke * self.g_terminal_rise_strokes,
+            ),
+            stroke=inst.stroke * self.g_hook_stroke_ratio,
             steps=32,
         )
         polygon(pen, hook, clockwise=True)
