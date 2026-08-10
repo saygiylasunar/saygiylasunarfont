@@ -66,14 +66,35 @@ Accent shapes themselves are still legacy-era geometry and are **not optically
 locked** by this gate. They will receive a dedicated family normalization pass;
 Gate 2 only guarantees that their base bodies now come from the new system.
 
-### Gate 3 — flow — NEXT
+### Gate 3 — flow — MASTER CANDIDATE PASSED
 
 `S s Ş ş`
 
-Tests spline/flow behavior. The result must remain digital and engineered without
-becoming seven-segment or mechanically broken.
+Gate 3 replaces the previous stacked-open-bowl construction with one continuous
+harmonic spine. The spine combines a fundamental and third harmonic, then uses a
+smooth stiffness transform before a role-independent stroke expansion:
 
-### Gate 4 — decimal/digital numerals
+`((1-m) cos(pi t) + m cos(3 pi t)) -> tanh(k f) / tanh(k)`
+
+The third harmonic creates the two shoulders near the 1/3 and 2/3 regions while
+preserving mirrored flow. Uppercase uses a stronger harmonic/stiffness setting;
+lowercase relaxes the same family instead of scaling the capital mechanically.
+
+Validated in CI and raster review:
+
+- odd mirror symmetry around the glyph center;
+- mathematically generated shoulder turns near thirds;
+- continuous centerline/stroke expansion instead of segment assembly;
+- `S` and `s` share one flow family with lowercase optical relaxation;
+- Dyadic-32 stroke quantization remains valid;
+- `Ş` and `ş` compose from the migrated flow bodies;
+- mixed O/C/G/S specimens retain one family character after a second stiffness
+  tuning pass.
+
+As in Gate 2, cedilla geometry is still a legacy accent and remains outside the
+optical lock of this gate.
+
+### Gate 4 — decimal/digital numerals — NEXT
 
 `2 3 5 6 9`
 
