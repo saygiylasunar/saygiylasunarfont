@@ -13,9 +13,6 @@ from .moldcaster import TRIHEX_36, Mold, Moldcaster
 from .solver import ConstructionSolver
 
 
-# The S family is not drawn as stacked bowls. It derives a continuous spine from
-# FLOW_DNA, then expands that spine by the resolved stroke. Lowercase relaxes the
-# same identity rather than introducing a separate curve language.
 LOWER_FLOW_DNA = FLOW_DNA.derive(
     exponent_delta=-0.14,
     terminal_delta=0.010,
@@ -53,15 +50,14 @@ class FlowMaster:
     source_stroke: float = M.stroke
     source_overshoot: float = M.overshoot
 
-    # Optical review showed that the first harmonic S exposed its mathematics
-    # too strongly. Keep the third harmonic, but give it less authority while
-    # increasing the continuous stiffness transform. Quarter-core amplitude
-    # corrections widen the silhouette without abandoning the 36-core mold.
-    upper_amplitude: float = 6.25 * CORE_UNIT
-    lower_amplitude: float = 5.75 * CORE_UNIT
-    upper_harmonic_mix: float = 0.66
-    lower_harmonic_mix: float = 0.62
-    stiffness_gain: float = 0.76
+    # Optical review: keep the harmonic construction but stop advertising the
+    # equation. Quarter-core width corrections and rational harmonic weights
+    # produce longer engineered shoulders with a quieter crossover.
+    upper_amplitude: float = (25.0 / 4.0) * CORE_UNIT
+    lower_amplitude: float = (23.0 / 4.0) * CORE_UNIT
+    upper_harmonic_mix: float = 2.0 / 3.0
+    lower_harmonic_mix: float = 5.0 / 8.0
+    stiffness_gain: float = 3.0 / 4.0
 
     def _solver(self) -> ConstructionSolver:
         return ConstructionSolver(Moldcaster(self.source_cell))
@@ -155,7 +151,7 @@ class FlowMaster:
             stiffness=instance.stiffness,
             steps=88,
             terminal_relief=0.010,
-            diagonal_compensation=0.012,
+            diagonal_compensation=0.0125,
         )
 
     def draw(self, pen: TTGlyphPen, kind: str) -> None:
