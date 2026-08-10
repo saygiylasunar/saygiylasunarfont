@@ -2,7 +2,7 @@
 
 ## Status
 
-The preparatory architecture is considered complete when CI validates:
+The preparatory architecture is complete. CI validates:
 
 - 36-unit native core;
 - dimensionless curvature DNA;
@@ -15,19 +15,35 @@ The preparatory architecture is considered complete when CI validates:
 - Turkish source-level repertoire;
 - deterministic TTF build and audit.
 
-The next phase is **glyph migration**, not further foundation invention unless a
-migration reveals a genuine structural defect.
+The current phase is **glyph migration**, not further foundation invention unless
+a migration reveals a genuine structural defect.
 
 ## Migration order
 
-### Gate 1 — closed round / ambiguity
+### Gate 1 — closed round / ambiguity — MASTER CANDIDATE PASSED
 
-`O 0`
+`O 0` (+ `Ö` through source-level composition)
 
-Must establish the primary stiffness/roundness identity and survive poor
-reproduction. `0` must remain unmistakable without turning into a novelty glyph.
+Gate 1 now uses the parametric superellipse master through the migration
+registry. The O is the pure round-family carrier. `0` is a controlled derivative
+with a slightly narrower silhouette, slightly stiffer numeric curvature and a
+mold-aware documentary slash.
 
-### Gate 2 — open round / aperture
+Validated in CI and raster review:
+
+- strict shared advance width;
+- centered/symmetric closed forms;
+- distinct O/0 silhouettes without family break;
+- Trihex-native slash attraction;
+- Decimal-10 normalized casting;
+- Dyadic-32 stroke quantization and angle reinterpretation;
+- Turkish `Ö` composition from the migrated O.
+
+This is a **master candidate**, not a release freeze. Later family review may
+apply a coordinated CORE/BOWL DNA adjustment, but Gate 1 should not receive
+isolated cosmetic edits unless a new legibility issue appears.
+
+### Gate 2 — open round / aperture — IN PROGRESS
 
 `C G c e`
 
@@ -109,4 +125,4 @@ architecture can express a glyph through:
 
 `normalized geometry → family DNA → role constraints → mold interpretation → optical correction → outline`
 
-That pipeline is the contract for the next phase.
+That pipeline is the contract for the migration phase.
