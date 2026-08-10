@@ -7,7 +7,8 @@ from fontTools.pens.ttGlyphPen import TTGlyphPen
 from .config import CORE_UNIT, M
 from .constraints import PointRole
 from .curvature import LOWER_BOWL_DNA, ResolvedCurve, resolve_curve
-from .geometry import profiled_ring, rect, thick_segment
+from .curveprimitives import stroked_quadratic_outline
+from .geometry import polygon, profiled_ring, rect, thick_segment
 from .moldcaster import TRIHEX_36, Mold, Moldcaster
 from .solver import ConstructionSolver
 
@@ -25,7 +26,7 @@ class LowerClosedInstance:
     profile: ResolvedCurve
     stem_x0: float | None = None
     descender_bottom: float | None = None
-    hook_left: float | None = None
+    hook_start_y: float | None = None
     terminal_left: float | None = None
     foot_right: float | None = None
 
@@ -36,12 +37,7 @@ class LowerClosedInstance:
 
 @dataclass(frozen=True)
 class LowerClosedMaster:
-    """Shared single-storey o/a/g body with documentary derivatives.
-
-    The body is the source of truth. `a` adds one right stem and restrained foot;
-    `g` extends the same stem into a compact descender/hook. This preserves the
-    successful legacy silhouettes while removing independent outline arithmetic.
-    """
+    """Shared single-storey o/a/g body with documentary derivatives."""
 
     source_cell: float = M.advance
     source_height: float = M.x_height
@@ -146,26 +142,20 @@ class LowerClosedMaster:
             self.source_height,
             target_body_height,
         )
-        hook_left = self._resolve_x(
-            6.8 * CORE_UNIT,
-            target_cell=target_cell,
-            mold=mold,
-            role=PointRole.TERMINAL,
-            strength_scale=0.22,
-        )
         terminal_left = self._resolve_x(
-            4.8 * CORE_UNIT,
+            5.2 * CORE_UNIT,
             target_cell=target_cell,
             mold=mold,
             role=PointRole.TERMINAL,
-            strength_scale=0.16,
+            strength_scale=0.14,
         )
+        hook_start_y = descender_bottom + stroke * 1.10
         return LowerClosedInstance(
             **{
                 **instance.__dict__,
                 "stem_x0": stem_x0,
                 "descender_bottom": descender_bottom,
-                "hook_left": hook_left,
+                "hook_start_y": hook_start_y,
                 "terminal_left": terminal_left,
             }
         )
@@ -200,24 +190,28 @@ class LowerClosedMaster:
             return
 
         assert inst.descender_bottom is not None
-        assert inst.hook_left is not None
+        assert inst.hook_start_y is not None
         assert inst.terminal_left is not None
-        rect(pen, inst.stem_x0, inst.descender_bottom, inst.x1, inst.body_height)
+
+        stem_center = (inst.stem_x0 + inst.x1) / 2.0
+        # The old rect+segment hook produced a diamond at the overlap. One
+        # quadratic centerline now leaves the vertical stem with a vertical
+        # tangent and turns continuously into the terminal.
         rect(
             pen,
-            inst.hook_left,
-            inst.descender_bottom,
+            inst.stem_x0,
+            inst.hook_start_y - inst.stroke * 0.55,
             inst.x1,
-            inst.descender_bottom + inst.stroke,
+            inst.body_height,
         )
-        thick_segment(
-            pen,
-            inst.hook_left,
-            inst.descender_bottom + inst.stroke * 0.20,
-            inst.terminal_left,
-            inst.descender_bottom + inst.stroke * 0.72,
-            inst.stroke * 0.68,
+        hook = stroked_quadratic_outline(
+            (stem_center, inst.hook_start_y),
+            (stem_center, inst.descender_bottom),
+            (inst.terminal_left, inst.descender_bottom + inst.stroke * 0.72),
+            stroke=inst.stroke * 0.82,
+            steps=32,
         )
+        polygon(pen, hook, clockwise=True)
 
 
 LOWER_CLOSED_MASTER = LowerClosedMaster()
