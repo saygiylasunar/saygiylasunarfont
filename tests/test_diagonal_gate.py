@@ -19,20 +19,18 @@ def test_diagonal_fit_overrules_impossible_mold_angles() -> None:
         assert ctx.v_angle >= minimum_v - 1e-9
         assert ctx.v_angle < 90.0
 
-    # Z has enough room to respond more visibly to each mold, but dyadic 45° is
-    # still too shallow for the mono cell and therefore gets fit-clamped.
     assert decimal.z_angle > native.z_angle > digital.z_angle
     assert digital.z_angle > 45.0
 
 
-def test_W_skeleton_is_exactly_mirrored() -> None:
+def test_W_skeleton_is_exactly_mirrored_and_reads_as_capital() -> None:
     ctx = DIAGONAL_MASTER.resolve()
     p0, p1, p2, p3, p4 = ctx.w_points
     assert math.isclose(p0[0] + p4[0], ctx.cell, abs_tol=1e-9)
     assert math.isclose(p1[0] + p3[0], ctx.cell, abs_tol=1e-9)
     assert math.isclose(p2[0], ctx.cell / 2.0, abs_tol=1e-9)
-    assert math.isclose(p2[1], ctx.body_height * 0.45, abs_tol=1e-9)
-    assert math.isclose(p2[1], 9 * CORE_UNIT, abs_tol=1e-9)
+    assert math.isclose(p2[1], ctx.body_height * (3.0 / 5.0), abs_tol=1e-9)
+    assert math.isclose(p2[1], 12 * CORE_UNIT, abs_tol=1e-9)
     assert p0[1] == p4[1] == ctx.body_height
     assert p1[1] == p3[1] == 0.0
 
