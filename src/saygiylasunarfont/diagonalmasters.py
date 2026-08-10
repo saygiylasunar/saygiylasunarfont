@@ -122,9 +122,7 @@ class DiagonalMaster:
         outer_left = self._x(1.0, target_cell=target_cell, mold=mold, strength_scale=0.30)
         inner_left = self._x(5.0, target_cell=target_cell, mold=mold, strength_scale=0.36)
         center = target_cell / 2.0
-        # Optical review showed that 9/20 read as a lowercase w. Three-fifths is
-        # still an exact native relation: 12/20 cap height = 12 × 36 = 432.
-        center_y = 12.0 / 20.0 * target_body_height
+        center_y = (3.0 / 5.0) * target_body_height
         w_points = (
             (outer_left, target_body_height),
             (inner_left, 0.0),
@@ -150,9 +148,7 @@ class DiagonalMaster:
         thick_segment(pen, center, 0.0, center + run, ctx.body_height, ctx.stroke)
 
     def draw_W(self, pen: TTGlyphPen, ctx: DiagonalContext) -> None:
-        # Four diagonals accumulate more black than V. A small optical reduction
-        # keeps W capital in mass without turning the mono cell into a dark block.
-        width = ctx.stroke * 0.88
+        width = ctx.stroke * (7.0 / 8.0)
         for a, b in zip(ctx.w_points, ctx.w_points[1:]):
             thick_segment(pen, a[0], a[1], b[0], b[1], width)
 
