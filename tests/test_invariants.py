@@ -18,7 +18,7 @@ from saygiylasunarfont.curvature import (
     sample_superellipse,
 )
 from saygiylasunarfont.geometry import IsoBasis
-from saygiylasunarfont.glyphs import DRAWERS, build_glyphs
+from saygiylasunarfont.registry import DRAWERS, build_glyphs
 
 
 def test_glyph_names_are_unique() -> None:
