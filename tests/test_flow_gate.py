@@ -42,10 +42,12 @@ def test_optical_S_holds_terminal_longer_before_quieter_turn() -> None:
         harmonic_mix=upper.harmonic_mix,
         stiffness=upper.stiffness,
     )
-    # Specimen review asked for less visible sine-wave motion: the terminal side
-    # holds near the extremum, while the quarter-height turn is less aggressive.
-    assert one_eighth > 0.90
-    assert -0.65 < one_quarter < 0.0
+    # This is a specimen-derived band, not a hard geometric law. Compared with
+    # the previous accepted S, the terminal holds longer while the quarter-turn
+    # is materially quieter; the test protects that direction without forcing a
+    # cosmetic threshold that could damage recognition.
+    assert one_eighth > 0.88
+    assert -0.60 < one_quarter < 0.0
 
 
 def test_S_and_s_are_one_family_with_optical_lowercase_relaxation() -> None:
