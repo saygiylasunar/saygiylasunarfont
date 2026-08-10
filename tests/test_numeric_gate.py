@@ -31,11 +31,24 @@ def test_two_diagonal_reinterprets_without_changing_source_geometry() -> None:
     assert seed < digital.two_diagonal_angle < 45.0
 
 
-def test_three_uses_one_continuous_two_lobe_flow() -> None:
-    values = [periodic_flow_unit(t, lobes=2, polarity=-1.0, stiffness=2.1) for t in (0, 0.25, 0.5, 0.75, 1)]
+def test_two_transition_uses_rational_optical_join_parameters() -> None:
+    assert math.isclose(NUMERIC_MASTER.two_control_y_core, 21.0 / 2.0)
+    assert math.isclose(NUMERIC_MASTER.two_join_outer_stroke, 1.0 / 3.0)
+    assert math.isclose(NUMERIC_MASTER.two_join_control_stroke, 1.0 / 6.0)
+    assert math.isclose(NUMERIC_MASTER.two_transition_stroke_ratio, 24.0 / 25.0)
+
+
+def test_three_uses_one_continuous_two_lobe_flow_with_reduced_stiffness() -> None:
+    values = [
+        periodic_flow_unit(t, lobes=2, polarity=-1.0, stiffness=2.1)
+        for t in (0, 0.25, 0.5, 0.75, 1)
+    ]
     expected = (-1.0, 1.0, -1.0, 1.0, -1.0)
     for value, target in zip(values, expected):
         assert math.isclose(value, target, abs_tol=1e-9)
+    assert math.isclose(NUMERIC_MASTER.three_stiffness_gain, 1.0 / 3.0)
+    assert NUMERIC_MASTER.three_left_core > 3.0
+    assert NUMERIC_MASTER.three_right_core == 15.0
 
 
 def test_numeric_profiles_keep_open_and_ring_forms_related_but_distinct() -> None:
