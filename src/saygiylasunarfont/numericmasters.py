@@ -8,8 +8,9 @@ from fontTools.pens.ttGlyphPen import TTGlyphPen
 from .config import CORE_UNIT, M
 from .constraints import DECIMAL_AXES, DYADIC_AXES, TRIHEX_AXES, PointRole
 from .curvature import NUMERIC_DNA, ResolvedCurve, resolve_curve
+from .curveprimitives import stroked_quadratic_outline
 from .flowcurve import stroked_periodic_flow_outline
-from .geometry import axis_segment, polygon, profiled_open_bowl, profiled_ring, rect, thick_segment
+from .geometry import polygon, profiled_open_bowl, profiled_ring, rect, thick_segment
 from .moldcaster import DECIMAL_10, DYADIC_32, TRIHEX_36, Mold, Moldcaster
 from .solver import ConstructionSolver
 
@@ -130,23 +131,28 @@ class NumericMaster:
             opening="left",
             steps=52,
         )
-        cx = ctx.cell / 2.0
-        cy = self._y(6.0, ctx=ctx)
-        dx = self._x(15.0, ctx=ctx) - self._x(3.0, ctx=ctx)
-        dy = self._y(8.0, ctx=ctx)
-        axis_segment(
-            pen,
-            cx,
-            cy,
-            math.hypot(dx, dy),
-            ctx.two_diagonal_angle,
-            ctx.stroke,
+
+        # A quadratic transition replaces the former independent diagonal. It
+        # leaves the bowl's lower-right shoulder almost vertically and then
+        # turns toward the baseline, visually approaching G1 continuity while
+        # preserving the moldable source proportions.
+        diagonal = stroked_quadratic_outline(
+            (x1 - ctx.stroke * 0.32, self._y(13.0, ctx=ctx)),
+            (x1 - ctx.stroke * 0.16, self._y(10.4, ctx=ctx)),
+            (self._x(3.0, ctx=ctx, role=PointRole.TERMINAL, strength_scale=0.34), self._y(2.0, ctx=ctx)),
+            stroke=ctx.stroke * 0.96,
+            steps=36,
         )
+        polygon(pen, diagonal, clockwise=True)
         rect(pen, self._x(2.0, ctx=ctx), 0.0, self._x(16.0, ctx=ctx), ctx.stroke)
 
     def draw_three(self, pen: TTGlyphPen, ctx: NumericContext) -> None:
-        left = self._x(3.0, ctx=ctx, role=PointRole.TERMINAL, strength_scale=0.48)
-        right = self._x(15.0, ctx=ctx, role=PointRole.BOWL_EXTREMUM)
+        # Optical review showed that the first periodic 3 inherited too much of
+        # the S gesture. Keep one continuous two-lobe equation, but reduce the
+        # stiffness and pull the left terminals/notch inward. Right lobes remain
+        # dominant, which restores numeric recognition without abandoning flow.
+        left = self._x(4.0, ctx=ctx, role=PointRole.TERMINAL, strength_scale=0.30)
+        right = self._x(15.0, ctx=ctx, role=PointRole.BOWL_EXTREMUM, strength_scale=0.42)
         over = self._overshoot(ctx=ctx)
         points = stroked_periodic_flow_outline(
             center_x=(left + right) / 2.0,
@@ -156,10 +162,10 @@ class NumericMaster:
             stroke=ctx.stroke,
             lobes=2,
             polarity=-1.0,
-            stiffness=ctx.open_profile.exponent * 0.58,
+            stiffness=ctx.open_profile.exponent * 0.34,
             steps=112,
-            terminal_relief=0.015,
-            diagonal_compensation=0.015,
+            terminal_relief=0.025,
+            diagonal_compensation=0.012,
         )
         polygon(pen, points, clockwise=True)
 
