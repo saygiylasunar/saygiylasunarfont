@@ -3,6 +3,7 @@ from __future__ import annotations
 from .glyphs import (
     DRAWERS as LEGACY_DRAWERS,
     _glyph,
+    _notdef,
     _upper_diaeresis,
     glyph_name,
 )
@@ -26,16 +27,9 @@ MIGRATED_GLYPHS = frozenset({"O", "0", "Ö"})
 
 def build_glyphs() -> tuple[list[str], dict[str, object], dict[int, str]]:
     order = [".notdef"]
-    glyphs: dict[str, object] = {".notdef": _glyph(LEGACY_DRAWERS.get("\0"))}
-
-    # Keep .notdef sourced from the legacy module without exposing a second
-    # master during Gate 1. Rebuild it directly if the sentinel lookup is absent.
-    if LEGACY_DRAWERS.get("\0") is None:
-        from .glyphs import _notdef
-
-        glyphs[".notdef"] = _glyph(_notdef)
-
+    glyphs: dict[str, object] = {".notdef": _glyph(_notdef)}
     cmap: dict[int, str] = {}
+
     for ch, draw in DRAWERS.items():
         name = glyph_name(ch)
         if name in glyphs:
