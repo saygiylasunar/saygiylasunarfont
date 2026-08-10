@@ -145,8 +145,8 @@ class NumericMaster:
         rect(pen, self._x(2.0, ctx=ctx), 0.0, self._x(16.0, ctx=ctx), ctx.stroke)
 
     def draw_three(self, pen: TTGlyphPen, ctx: NumericContext) -> None:
-        left = self._x(2.0, ctx=ctx, role=PointRole.TERMINAL, strength_scale=0.48)
-        right = self._x(16.0, ctx=ctx, role=PointRole.BOWL_EXTREMUM)
+        left = self._x(3.0, ctx=ctx, role=PointRole.TERMINAL, strength_scale=0.48)
+        right = self._x(15.0, ctx=ctx, role=PointRole.BOWL_EXTREMUM)
         over = self._overshoot(ctx=ctx)
         points = stroked_periodic_flow_outline(
             center_x=(left + right) / 2.0,
