@@ -58,10 +58,10 @@ class O0Master:
     source_stroke: float = M.stroke
     source_overshoot: float = M.overshoot
     o_inset: float = 2 * CORE_UNIT
-    zero_inset: float = 2.25 * CORE_UNIT
+    zero_inset: float = 2.5 * CORE_UNIT
     slash_seed_angle: float = 54.0
-    slash_length_ratio: float = 0.78
-    slash_width_ratio: float = 0.68
+    slash_length_ratio: float = 0.74
+    slash_width_ratio: float = 0.58
 
     def _solver(self) -> ConstructionSolver:
         return ConstructionSolver(Moldcaster(self.source_cell))
