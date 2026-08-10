@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 
 from saygiylasunarfont.constraints import DECIMAL_AXES, DYADIC_AXES, TRIHEX_AXES, nearest_angle
+from saygiylasunarfont.flowcurve import periodic_flow_unit
 from saygiylasunarfont.moldcaster import DECIMAL_10, DYADIC_32, TRIHEX_36
 from saygiylasunarfont.numericmasters import NUMERIC_MASTER
 from saygiylasunarfont.registry import MIGRATED_GLYPHS
@@ -28,6 +29,13 @@ def test_two_diagonal_reinterprets_without_changing_source_geometry() -> None:
     assert 30.0 < native.two_diagonal_angle < seed
     assert decimal.two_diagonal_angle < native.two_diagonal_angle
     assert seed < digital.two_diagonal_angle < 45.0
+
+
+def test_three_uses_one_continuous_two_lobe_flow() -> None:
+    values = [periodic_flow_unit(t, lobes=2, polarity=-1.0, stiffness=2.1) for t in (0, 0.25, 0.5, 0.75, 1)]
+    expected = (-1.0, 1.0, -1.0, 1.0, -1.0)
+    for value, target in zip(values, expected):
+        assert math.isclose(value, target, abs_tol=1e-9)
 
 
 def test_numeric_profiles_keep_open_and_ring_forms_related_but_distinct() -> None:
