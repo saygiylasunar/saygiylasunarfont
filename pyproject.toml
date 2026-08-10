@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "saygiylasunarfont"
+version = "0.5.0"
+description = "Parametric geometric monospaced font with moldable construction systems"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = ["fonttools>=4.53"]
+
+[project.scripts]
+syf-build = "saygiylasunarfont.build:main"
+syf-audit = "saygiylasunarfont.audit:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
