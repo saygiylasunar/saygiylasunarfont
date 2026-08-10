@@ -24,10 +24,10 @@ a migration reveals a genuine structural defect.
 
 `O 0` (+ `Ö` through source-level composition)
 
-Gate 1 now uses the parametric superellipse master through the migration
-registry. The O is the pure round-family carrier. `0` is a controlled derivative
-with a slightly narrower silhouette, slightly stiffer numeric curvature and a
-mold-aware documentary slash.
+Gate 1 uses the parametric superellipse master through the migration registry.
+The O is the pure round-family carrier. `0` is a controlled derivative with a
+slightly narrower silhouette, slightly stiffer numeric curvature and a mold-aware
+documentary slash.
 
 Validated in CI and raster review:
 
@@ -43,14 +43,30 @@ This is a **master candidate**, not a release freeze. Later family review may
 apply a coordinated CORE/BOWL DNA adjustment, but Gate 1 should not receive
 isolated cosmetic edits unless a new legibility issue appears.
 
-### Gate 2 — open round / aperture — IN PROGRESS
+### Gate 2 — open round / aperture — MASTER CANDIDATE PASSED
 
-`C G c e`
+`C G c e` (+ `Ç Ğ ç` through source-level composition)
 
-Tests whether one curvature DNA can produce open forms with different aperture,
-crossbar and terminal requirements.
+Gate 2 derives all four forms from OPEN_DNA. Lowercase forms receive controlled
+extra optical freedom and aperture; `e` is a recognition-oriented derivative of
+`c`, while `G` uses a restrained documentary shelf/spur rather than a separate
+outline language.
 
-### Gate 3 — flow
+Validated in CI and raster review:
+
+- shared open-bowl curvature ancestry with Gate 1;
+- C/G and c/e paired geometry remains centered and monospaced;
+- `e` aperture is more open than `c` while retaining the same family body;
+- `G` remains recognisable without collapsing into C+dash;
+- Decimal-10 scaling preserves stroke ratio;
+- Dyadic-32 quantization preserves open-family relationships;
+- `Ç`, `Ğ`, `ç` compose from migrated bodies.
+
+Accent shapes themselves are still legacy-era geometry and are **not optically
+locked** by this gate. They will receive a dedicated family normalization pass;
+Gate 2 only guarantees that their base bodies now come from the new system.
+
+### Gate 3 — flow — NEXT
 
 `S s Ş ş`
 
