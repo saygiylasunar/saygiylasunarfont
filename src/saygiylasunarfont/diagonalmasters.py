@@ -125,7 +125,8 @@ class DiagonalMaster:
         outer_left = self._x(1.0, target_cell=target_cell, mold=mold, strength_scale=0.30)
         inner_left = self._x(5.0, target_cell=target_cell, mold=mold, strength_scale=0.36)
         center = target_cell / 2.0
-        center_y = 8.0 / 20.0 * target_body_height
+        # Nine native 36-core units: 324 / 720 = 9/20 of cap height.
+        center_y = 9.0 / 20.0 * target_body_height
         w_points = (
             (outer_left, target_body_height),
             (inner_left, 0.0),
@@ -162,12 +163,14 @@ class DiagonalMaster:
         rect(pen, left, 0.0, right, ctx.stroke)
         vertical_span = ctx.body_height - ctx.stroke
         length = vertical_span / math.sin(math.radians(ctx.z_angle))
+        # In font coordinates a standard Z diagonal rises from bottom-left to
+        # top-right, so the fitted positive angle is used directly.
         axis_segment(
             pen,
             ctx.cell / 2.0,
             ctx.body_height / 2.0,
             length,
-            180.0 - ctx.z_angle,
+            ctx.z_angle,
             ctx.stroke,
         )
 
