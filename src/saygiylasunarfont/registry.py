@@ -12,6 +12,7 @@ from .glyphs import (
     glyph_name,
 )
 from .masters import draw_O, draw_zero
+from .numericmasters import draw_2, draw_3, draw_5, draw_6, draw_9
 from .openmasters import draw_C, draw_G, draw_c, draw_e
 
 
@@ -38,11 +39,22 @@ DRAWERS.update(
         "s": draw_s,
         "Ş": _with(draw_S, _cedilla),
         "ş": _with(draw_s, _cedilla),
+        # Gate 4 — decimal / digital numeric derivatives
+        "2": draw_2,
+        "3": draw_3,
+        "5": draw_5,
+        "6": draw_6,
+        "9": draw_9,
     }
 )
 
 MIGRATED_GLYPHS = frozenset(
-    {"O", "0", "Ö", "C", "G", "c", "e", "Ç", "Ğ", "ç", "S", "s", "Ş", "ş"}
+    {
+        "O", "0", "Ö",
+        "C", "G", "c", "e", "Ç", "Ğ", "ç",
+        "S", "s", "Ş", "ş",
+        "2", "3", "5", "6", "9",
+    }
 )
 
 
