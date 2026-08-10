@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from .diagonalmasters import draw_V, draw_W, draw_Z
 from .flowmasters import draw_S, draw_s
 from .glyphs import (
     DRAWERS as LEGACY_DRAWERS,
@@ -45,6 +46,10 @@ DRAWERS.update(
         "5": draw_5,
         "6": draw_6,
         "9": draw_9,
+        # Gate 5 — diagonal / projective family
+        "V": draw_V,
+        "W": draw_W,
+        "Z": draw_Z,
     }
 )
 
@@ -54,6 +59,7 @@ MIGRATED_GLYPHS = frozenset(
         "C", "G", "c", "e", "Ç", "Ğ", "ç",
         "S", "s", "Ş", "ş",
         "2", "3", "5", "6", "9",
+        "V", "W", "Z",
     }
 )
 
