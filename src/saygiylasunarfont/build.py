@@ -5,7 +5,7 @@ from pathlib import Path
 from fontTools.fontBuilder import FontBuilder
 
 from .config import FAMILY_NAME, M, POSTSCRIPT_NAME, STYLE_NAME, VERSION
-from .glyphs import build_glyphs
+from .registry import build_glyphs
 
 
 def build(output: Path | str = "build/SaygiylaSunarMono-Regular.ttf") -> Path:
