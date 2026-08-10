@@ -13,6 +13,7 @@ from saygiylasunarfont.constraints import (
     nearest_angle,
 )
 from saygiylasunarfont.moldcaster import DECIMAL_10, DYADIC_32, TRIHEX_36, Moldcaster
+from saygiylasunarfont.solver import ConstructionSolver
 
 
 def test_36_is_the_native_core_not_an_incidental_number() -> None:
@@ -33,7 +34,6 @@ def test_molds_express_distinct_factor_systems() -> None:
 
 def test_affine_cast_preserves_normalized_geometry() -> None:
     caster = Moldcaster(M.advance)
-    # One 36-unit core is exactly 1/18 of the source cell.
     assert math.isclose(caster.cast(CORE_UNIT, target_span=180), 10.0)
     assert math.isclose(caster.cast(M.advance / 3, target_span=100), 100 / 3)
     assert math.isclose(caster.cast(M.advance / 3, target_span=32), 32 / 3)
@@ -84,3 +84,31 @@ def test_angle_families_cover_document_trihex_and_dyadic_axes() -> None:
     assert nearest_angle(58.0, TRIHEX_AXES) == 60.0
     assert nearest_angle(47.0, DYADIC_AXES) == 45.0
     assert math.isclose(attract_angle(58.0, target=60.0, strength=1.0), 60.0)
+
+
+def test_solver_uses_point_role_to_control_mold_authority() -> None:
+    solver = ConstructionSolver(Moldcaster(M.advance))
+    source = M.advance * 0.487
+    raw = 48.7
+    stem = solver.solve_coordinate(
+        source,
+        target_span=100,
+        mold=DECIMAL_10,
+        role=PointRole.STEM,
+    )
+    optical = solver.solve_coordinate(
+        source,
+        target_span=100,
+        mold=DECIMAL_10,
+        role=PointRole.OPTICAL,
+    )
+    assert abs(stem - 50.0) < abs(raw - 50.0)
+    assert abs(optical - raw) < abs(stem - raw)
+
+
+def test_solver_uses_role_strength_for_angles() -> None:
+    solver = ConstructionSolver(Moldcaster(M.advance))
+    stem = solver.solve_angle(58.0, role=PointRole.STEM, families=(TRIHEX_AXES,))
+    optical = solver.solve_angle(58.0, role=PointRole.OPTICAL, families=(TRIHEX_AXES,))
+    assert abs(stem - 60.0) < abs(optical - 60.0)
+    assert abs(optical - 58.0) < abs(stem - 58.0)
