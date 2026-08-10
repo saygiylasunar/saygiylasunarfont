@@ -107,6 +107,34 @@ def _smoothstep(value: float) -> float:
     return value * value * (3.0 - 2.0 * value)
 
 
+def _offset_centerline_point(
+    x: float,
+    y: float,
+    dx: float,
+    dy: float,
+    *,
+    stroke: float,
+    t: float,
+    terminal_relief: float,
+    diagonal_compensation: float,
+) -> tuple[Point, Point]:
+    length = math.hypot(dx, dy)
+    if length == 0:
+        raise ValueError("degenerate flow tangent")
+
+    nx = -dy / length
+    ny = dx / length
+    horizontal_motion = abs(dx) / length
+    edge = min(t, 1.0 - t) / 0.125
+    terminal_factor = 1.0 - terminal_relief * (1.0 - _smoothstep(edge))
+    diagonal_factor = 1.0 - diagonal_compensation * horizontal_motion
+    half = stroke * terminal_factor * diagonal_factor / 2.0
+    return (
+        (x + nx * half, y + ny * half),
+        (x - nx * half, y - ny * half),
+    )
+
+
 def stroked_flow_outline(
     *,
     center_x: float,
@@ -120,12 +148,7 @@ def stroked_flow_outline(
     terminal_relief: float = 0.025,
     diagonal_compensation: float = 0.025,
 ) -> list[Point]:
-    """Expand a harmonic centerline into one closed monoline outline.
-
-    The outline is generated from analytic tangents, not independently drawn
-    inner/outer contours. This keeps stroke and curvature related under scaling.
-    Small dimensionless optical terms reduce terminal and fast-diagonal pressure.
-    """
+    """Expand a harmonic centerline into one closed monoline outline."""
     if steps < 12:
         raise ValueError("steps must be at least 12")
     if stroke <= 0:
@@ -137,7 +160,6 @@ def stroked_flow_outline(
 
     left: list[Point] = []
     right: list[Point] = []
-
     for i in range(steps + 1):
         t = i / steps
         x, y = flow_spine_point(
@@ -157,21 +179,115 @@ def stroked_flow_outline(
             harmonic_mix=harmonic_mix,
             stiffness=stiffness,
         )
-        length = math.hypot(dx, dy)
-        if length == 0:
-            raise ValueError("degenerate flow tangent")
+        a, b = _offset_centerline_point(
+            x,
+            y,
+            dx,
+            dy,
+            stroke=stroke,
+            t=t,
+            terminal_relief=terminal_relief,
+            diagonal_compensation=diagonal_compensation,
+        )
+        left.append(a)
+        right.append(b)
+    return left + list(reversed(right))
 
-        nx = -dy / length
-        ny = dx / length
-        horizontal_motion = abs(dx) / length
 
-        # Relief fades out after the first/last 12.5% of the path.
-        edge = min(t, 1.0 - t) / 0.125
-        terminal_factor = 1.0 - terminal_relief * (1.0 - _smoothstep(edge))
-        diagonal_factor = 1.0 - diagonal_compensation * horizontal_motion
-        half = stroke * terminal_factor * diagonal_factor / 2.0
+def periodic_flow_unit(
+    t: float,
+    *,
+    lobes: int = 2,
+    polarity: float = -1.0,
+    stiffness: float = 2.1,
+) -> float:
+    """Stiffened cosine for repeated one-sided lobes such as digit 3.
 
-        left.append((x + nx * half, y + ny * half))
-        right.append((x - nx * half, y - ny * half))
+    With `lobes=2` and negative polarity the path is left at t=0, right at
+    quarter-height, left at mid-height, right at three-quarter-height and left
+    again at the baseline: the structural rhythm of a documentary 3.
+    """
+    if not 0.0 <= t <= 1.0:
+        raise ValueError("t must be in [0, 1]")
+    if lobes <= 0:
+        raise ValueError("lobes must be positive")
+    if stiffness <= 0:
+        raise ValueError("stiffness must be positive")
+    base = polarity * math.cos(2.0 * math.pi * lobes * t)
+    return math.tanh(stiffness * base) / math.tanh(stiffness)
 
+
+def periodic_flow_derivative(
+    t: float,
+    *,
+    lobes: int = 2,
+    polarity: float = -1.0,
+    stiffness: float = 2.1,
+) -> float:
+    if not 0.0 <= t <= 1.0:
+        raise ValueError("t must be in [0, 1]")
+    if lobes <= 0:
+        raise ValueError("lobes must be positive")
+    if stiffness <= 0:
+        raise ValueError("stiffness must be positive")
+    omega = 2.0 * math.pi * lobes
+    base = polarity * math.cos(omega * t)
+    base_prime = -polarity * omega * math.sin(omega * t)
+    cosh = math.cosh(stiffness * base)
+    return stiffness * (1.0 / (cosh * cosh)) * base_prime / math.tanh(stiffness)
+
+
+def stroked_periodic_flow_outline(
+    *,
+    center_x: float,
+    top: float,
+    bottom: float,
+    amplitude: float,
+    stroke: float,
+    lobes: int = 2,
+    polarity: float = -1.0,
+    stiffness: float = 2.1,
+    steps: int = 96,
+    terminal_relief: float = 0.015,
+    diagonal_compensation: float = 0.015,
+) -> list[Point]:
+    if top <= bottom:
+        raise ValueError("top must be above bottom")
+    if amplitude <= 0 or stroke <= 0:
+        raise ValueError("amplitude and stroke must be positive")
+    if steps < 16:
+        raise ValueError("steps must be at least 16")
+
+    left: list[Point] = []
+    right: list[Point] = []
+    dy = bottom - top
+    for i in range(steps + 1):
+        t = i / steps
+        wave = periodic_flow_unit(
+            t,
+            lobes=lobes,
+            polarity=polarity,
+            stiffness=stiffness,
+        )
+        wave_prime = periodic_flow_derivative(
+            t,
+            lobes=lobes,
+            polarity=polarity,
+            stiffness=stiffness,
+        )
+        x = center_x + amplitude * wave
+        y = top + dy * t
+        dx = amplitude * wave_prime
+        a, b = _offset_centerline_point(
+            x,
+            y,
+            dx,
+            dy,
+            stroke=stroke,
+            t=t,
+            terminal_relief=terminal_relief,
+            diagonal_compensation=diagonal_compensation,
+        )
+        left.append(a)
+        right.append(b)
     return left + list(reversed(right))
