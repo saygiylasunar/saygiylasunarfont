@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from .flowmasters import draw_S, draw_s
 from .glyphs import (
     DRAWERS as LEGACY_DRAWERS,
     _cedilla,
@@ -32,10 +33,17 @@ DRAWERS.update(
         "Ç": _with(draw_C, _cedilla),
         "Ğ": _upper_breve(draw_G),
         "ç": _with(draw_c, _cedilla),
+        # Gate 3 — continuous harmonic flow
+        "S": draw_S,
+        "s": draw_s,
+        "Ş": _with(draw_S, _cedilla),
+        "ş": _with(draw_s, _cedilla),
     }
 )
 
-MIGRATED_GLYPHS = frozenset({"O", "0", "Ö", "C", "G", "c", "e", "Ç", "Ğ", "ç"})
+MIGRATED_GLYPHS = frozenset(
+    {"O", "0", "Ö", "C", "G", "c", "e", "Ç", "Ğ", "ç", "S", "s", "Ş", "ş"}
+)
 
 
 def build_glyphs() -> tuple[list[str], dict[str, object], dict[int, str]]:
