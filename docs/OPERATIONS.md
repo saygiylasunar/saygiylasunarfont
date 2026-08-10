@@ -1,141 +1,130 @@
-# Saygıyla Sunar Mono — Operations Gate v0.4
+# Saygıyla Sunar Mono — Operations Gate v0.5
 
 ## Status
 
-The preparatory architecture is complete. CI validates:
+The preparatory architecture is complete and the **six diagnostic DNA gates are
+master candidates**. This is not a release freeze; it is the point at which the
+font has enough proven family grammar to expand deliberately.
+
+CI currently validates:
 
 - 36-unit native core;
-- dimensionless curvature DNA;
-- family derivatives;
+- dimensionless curvature DNA and family derivatives;
 - weight/scale invariance;
 - Trihex-36, Decimal-10 and Dyadic-32 Moldcaster paths;
-- role-based constraint hierarchy;
-- documentary / trihex / dyadic angle families;
+- documentary, trihex, decimal-factor and dyadic angle families;
+- role-based constraint hierarchy and fit constraints;
 - strict monospaced metrics;
 - Turkish source-level repertoire;
 - deterministic TTF build and audit.
 
-The current phase is **glyph migration**, not further foundation invention unless
-a migration reveals a genuine structural defect.
-
-## Migration order
+## Diagnostic gates
 
 ### Gate 1 — closed round / ambiguity — MASTER CANDIDATE PASSED
 
-`O 0` (+ `Ö` through source-level composition)
+`O 0` (+ `Ö` by composition)
 
-Gate 1 uses the parametric superellipse master through the migration registry.
-The O is the pure round-family carrier. `0` is a controlled derivative with a
-slightly narrower silhouette, slightly stiffer numeric curvature and a mold-aware
-documentary slash.
-
-Validated in CI and raster review:
-
-- strict shared advance width;
-- centered/symmetric closed forms;
-- distinct O/0 silhouettes without family break;
-- Trihex-native slash attraction;
-- Decimal-10 normalized casting;
-- Dyadic-32 stroke quantization and angle reinterpretation;
-- Turkish `Ö` composition from the migrated O.
-
-This is a **master candidate**, not a release freeze. Later family review may
-apply a coordinated CORE/BOWL DNA adjustment, but Gate 1 should not receive
-isolated cosmetic edits unless a new legibility issue appears.
+- O is the pure BOWL_DNA carrier.
+- `0` is slightly narrower/stiffer and receives a mold-aware documentary slash.
+- Native, Decimal-10 and Dyadic-32 interpretations retain one family identity.
+- O/0 separation survives small raster sizes without novelty styling.
 
 ### Gate 2 — open round / aperture — MASTER CANDIDATE PASSED
 
-`C G c e` (+ `Ç Ğ ç` through source-level composition)
+`C G c e` (+ `Ç Ğ ç` by composition)
 
-Gate 2 derives all four forms from OPEN_DNA. Lowercase forms receive controlled
-extra optical freedom and aperture; `e` is a recognition-oriented derivative of
-`c`, while `G` uses a restrained documentary shelf/spur rather than a separate
-outline language.
+- all derive from OPEN_DNA;
+- lowercase receives controlled aperture/optical freedom;
+- `e` is an open-family recognition derivative rather than a miniature E;
+- `G` uses a restrained documentary shelf/spur;
+- base-body relationships survive Decimal-10 and Dyadic-32 casts.
 
-Validated in CI and raster review:
-
-- shared open-bowl curvature ancestry with Gate 1;
-- C/G and c/e paired geometry remains centered and monospaced;
-- `e` aperture is more open than `c` while retaining the same family body;
-- `G` remains recognisable without collapsing into C+dash;
-- Decimal-10 scaling preserves stroke ratio;
-- Dyadic-32 quantization preserves open-family relationships;
-- `Ç`, `Ğ`, `ç` compose from migrated bodies.
-
-Accent shapes themselves are still legacy-era geometry and are **not optically
-locked** by this gate. They will receive a dedicated family normalization pass;
-Gate 2 only guarantees that their base bodies now come from the new system.
-
-### Gate 3 — flow — MASTER CANDIDATE PASSED
+### Gate 3 — harmonic flow — MASTER CANDIDATE PASSED
 
 `S s Ş ş`
 
-Gate 3 replaces the previous stacked-open-bowl construction with one continuous
-harmonic spine. The spine combines a fundamental and third harmonic, then uses a
-smooth stiffness transform before a role-independent stroke expansion:
+The S spine is continuous rather than stacked/segmented:
 
-`((1-m) cos(pi t) + m cos(3 pi t)) -> tanh(k f) / tanh(k)`
+`f(t) = (1-m) cos(pi t) + m cos(3 pi t)`
 
-The third harmonic creates the two shoulders near the 1/3 and 2/3 regions while
-preserving mirrored flow. Uppercase uses a stronger harmonic/stiffness setting;
-lowercase relaxes the same family instead of scaling the capital mechanically.
+followed by:
 
-Validated in CI and raster review:
+`tanh(k f) / tanh(k)`
 
-- odd mirror symmetry around the glyph center;
-- mathematically generated shoulder turns near thirds;
-- continuous centerline/stroke expansion instead of segment assembly;
-- `S` and `s` share one flow family with lowercase optical relaxation;
-- Dyadic-32 stroke quantization remains valid;
-- `Ş` and `ş` compose from the migrated flow bodies;
-- mixed O/C/G/S specimens retain one family character after a second stiffness
-  tuning pass.
+The third harmonic produces the two shoulders near the one-third/two-third
+regions. Analytic tangent/normal expansion produces the stroke. A second raster
+tuning pass increased harmonic stiffness without reintroducing seven-segment
+behavior.
 
-As in Gate 2, cedilla geometry is still a legacy accent and remains outside the
-optical lock of this gate.
-
-### Gate 4 — decimal/digital numerals — NEXT
+### Gate 4 — decimal / digital numerals — MASTER CANDIDATE PASSED
 
 `2 3 5 6 9`
 
-This gate explicitly tests decimal familiarity (2/5 structure) and dyadic/digital
-reinterpretation. Numerals must share family DNA with letters while retaining
-fast documentary recognition.
+- Decimal angle attractors are derived from integer slopes `1:2` and `2:5`, not
+  decorative base-10 angles.
+- `2` keeps one source construction while trihex, decimal and dyadic media pull
+  its diagonal differently.
+- `6/9` inherit the closed-ring grammar.
+- `5` inherits open-family behavior.
+- the first two-bowl `3` was rejected in raster review; final `3` is one
+  continuous two-lobe periodic flow with sequence `-1,+1,-1,+1,-1` and a
+  six-core half-width aligned to the S-family rhythm.
 
-### Gate 5 — diagonal/projective
+### Gate 5 — diagonal / projective — MASTER CANDIDATE PASSED
 
 `V W Z`
 
-Tests 30/60°, documentary axes and optical departure. Exact angle snapping is
-never allowed to damage rhythm.
+- mold angle attraction is subordinate to a geometric fit constraint, so an
+  attractive 45-degree dyadic axis cannot push a diagonal outside the mono cell;
+- `V` is a symmetric two-stroke skeleton;
+- `W` is a mirrored five-point skeleton with its center at `9 × 36 = 324`, or
+  `9/20` of cap height;
+- the first raster exposed a reversed Z diagonal and a low W center; both were
+  corrected before the gate was accepted;
+- final Z/2 separation remains immediate at small sizes.
 
-### Gate 6 — lowercase closed family
+### Gate 6 — lowercase closed family — MASTER CANDIDATE PASSED
 
-`a o g`
+`a o g` (+ `ö ğ` by composition)
 
-Tests whether lowercase character survives a more open, text-oriented curvature
-without becoming a separate typeface.
+- all three use exactly one resolved LOWER_BOWL_DNA body;
+- `a` preserves the successful single-storey silhouette and adds only a right
+  stem plus restrained technical foot;
+- `g` extends that same stem into a compact documentary descender/hook;
+- lowercase body sharing is tested directly, not merely judged visually;
+- Decimal-10 symmetry and Dyadic-32 stroke quantization remain valid.
+
+## Accent normalization — NEXT
+
+The base bodies of Turkish glyphs have migrated, but legacy diaeresis, breve,
+cedilla and dotted-I accent geometry is not yet optically locked. Normalize those
+accents before broad alphabet expansion so Turkish remains source-level rather
+than a late patch.
+
+## Expansion after accents
+
+Expand by structural families rather than alphabetic order:
+
+1. stem/document family;
+2. diagonal/projective family extensions;
+3. bowl/stem uppercase family;
+4. lowercase stem/arch family;
+5. remaining numerals and punctuation/symbol normalization.
 
 ## Three-mold review
 
-Every migrated family is reviewed in three representations:
+Every promoted family is reviewed in:
 
 1. **Native vector:** 648-unit cell, 36-unit core.
-2. **Decimal interpretation:** normalized geometry viewed through Decimal-10.
-3. **Digital interpretation:** normalized geometry viewed through Dyadic-32,
-   including quantized stroke where appropriate.
+2. **Decimal interpretation:** Decimal-10.
+3. **Digital interpretation:** Dyadic-32 with quantized stroke where appropriate.
 
-A family does not need identical coordinates across molds. It must preserve:
-
-- recognition;
-- characteristic stiffness/roundness;
-- terminal behavior;
-- stroke hierarchy;
-- family relationship.
+Coordinates need not match across molds. Recognition, family character,
+curvature/stroke hierarchy and terminal behavior must.
 
 ## Constraint priority
 
-When a migration exposes a conflict:
+When rules conflict:
 
 1. recognition / legibility;
 2. family identity;
@@ -146,20 +135,10 @@ When a migration exposes a conflict:
 
 ## Change discipline
 
-During migration:
-
-- change `CORE_DNA` only when the entire typeface should move;
-- change a family derivative when a whole glyph family should move;
+- change CORE_DNA only when the whole typeface should move;
+- change a family derivative when the whole family should move;
 - use glyph-local deltas only for recognition-critical exceptions;
 - never hard-code a coordinate merely to match one specimen size;
 - add a regression test whenever a mathematical invariant is introduced;
-- keep `main` untouched until the diagnostic core is visually coherent.
-
-## Definition of ready
-
-Foundation work is ready for glyph operations when CI is green and the current
-architecture can express a glyph through:
-
-`normalized geometry → family DNA → role constraints → mold interpretation → optical correction → outline`
-
-That pipeline is the contract for the migration phase.
+- keep `main` untouched until the diagnostic core and first expanded alphabet
+  are visually coherent.
